@@ -156,6 +156,7 @@ def find_best_deal(
 
 last_was_axa = False
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
+    global last_was_axa
     if last_was_axa:
         return -1
     if skus == "AxA":
@@ -172,4 +173,5 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+
 
