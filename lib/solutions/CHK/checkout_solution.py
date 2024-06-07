@@ -9,9 +9,15 @@ import math
 from functools import cache, partial
 import line_profiler
 from multiprocessing import Pool
+from threading import Thread
 
 Quantities = frozendict[str, int]
 
+class DealFinder(Thread):
+    def __init__(self):
+        self.queue = []
+
+    def run(self)
 
 @dataclass(frozen=True)
 class Offer:
@@ -118,6 +124,7 @@ def get_quantities(skus: str) -> Quantities:
 
 
 def find_best_deal_applying_offer(
+    pool: Pool,
     quantities: Quantities,
     offers: frozenset[Offer],
     offer: Offer,
@@ -130,7 +137,7 @@ def find_best_deal_applying_offer(
             )
     new_quantities = frozendict(new_quantities)
 
-    rest_of_deal = find_best_deal(new_quantities, offers=offers)
+    rest_of_deal = find_best_deal(pool, new_quantities, offers=offers)
     if rest_of_deal is None:
         return None
 
@@ -153,7 +160,7 @@ def find_best_deal(
 
     applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
 
-    results = pool.map(partial(find_best_deal_applying_offer, quantities, applicable_offers), applicable_offers)
+    results = pool.map(partial(find_best_deal_applying_offer, pool, quantities, applicable_offers), applicable_offers)
     results = filter(results, lambda result: result is not None)
 
     if len(results) == 0:
@@ -162,10 +169,12 @@ def find_best_deal(
     return min(results, key=lambda result: result[1])[0]
 
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
-    best_deal = find_best_deal(
-        get_quantities(skus),
-        offers=offers
-    )
+    with Pool(5) as pool:
+        best_deal = find_best_deal(
+            pool,
+            get_quantities(skus),
+            offers=offers
+        )
 
     if best_deal is None:
         return -1
@@ -174,6 +183,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
