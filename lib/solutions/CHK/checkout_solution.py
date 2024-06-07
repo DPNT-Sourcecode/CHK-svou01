@@ -127,11 +127,13 @@ def find_best_deal(
     @dataclass
     class Scenario:
         quantities: Quantities
-        applied_offers: set[Offer]
+        deal: Deal
         available_offers: frozenset[Offer]
     
     queue = Queue()
-    queue.put(Scenario(quantities, set(), offers))
+    empty = FrozenList([])
+    empty.freeze()
+    queue.put(Scenario(quantities, empty, offers))
 
     best_price = math.inf
     best_deal = None
@@ -142,15 +144,11 @@ def find_best_deal(
         except Empty:
             break
             
-        print(scenario.quantities)
-
         if all(quantity == 0 for quantity in scenario.quantities.values()):
-            deal = FrozenList(list(scenario.applied_offers))
-            deal.freeze()
-            price = get_deal_price(deal)
+            price = get_deal_price(scenario.deal)
             if price < best_price:
                 best_price = price
-                best_deal = deal
+                best_deal = scenario.deal
             continue
 
         applicable_offers = frozenset(
@@ -161,16 +159,19 @@ def find_best_deal(
         )
 
         for offer in applicable_offers:
-            new_quantities = {**quantities}
+            new_quantities = {**scenario.quantities}
             for included_sku, included_quantity in offer.includes.items():
                 if included_sku in new_quantities:
                     new_quantities[included_sku] = max(
                         0, new_quantities[included_sku] - included_quantity
                     )
+            
+            new_deal = FrozenList([offer, *scenario.deal])
+            new_deal.freeze()
 
             queue.put(Scenario(
                 frozendict(new_quantities),
-                set([offer]).union(scenario.applied_offers),
+                new_deal,
                 applicable_offers
             ))
 
@@ -189,7 +190,8 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    checkout("A")
+    print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO"))
+
 
 
 
