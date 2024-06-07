@@ -4,6 +4,7 @@
 from dataclasses import dataclass
 from typing import Optional, Callable
 from frozendict import frozendict
+from frozenlist import FrozenList
 import math
 from functools import lru_cache
 
@@ -15,7 +16,7 @@ class Offer:
     includes: Quantities
     price: int
 
-Deal = frozenlist[Offer]
+Deal = FrozenList[Offer]
 
 @lru_cache(maxsize=None)
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
@@ -58,7 +59,7 @@ def get_quantities(skus: str) -> Quantities:
 def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     global indent
     if all(quantity == 0 for quantity in quantities.values()):
-        return frozenlist([])
+        return FrozenList([])
     
     applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
     
@@ -77,7 +78,8 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
         rest_of_deal = find_best_deal(new_quantities)
         if rest_of_deal is None:
             continue
-        new_deal = frozenlist([offer, *rest_of_deal])
+        new_deal = FrozenList([offer, *rest_of_deal])
+        new_deal.freeze()
         if (new_deal_price := get_deal_price(new_deal)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
@@ -92,6 +94,7 @@ def checkout(skus: str):
         return -1
     
     return get_deal_price(best_deal)
+
 
 
 

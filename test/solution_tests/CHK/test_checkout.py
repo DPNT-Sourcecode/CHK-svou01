@@ -33,10 +33,11 @@ class TestCheckout():
       assert sln.checkout("AEBADCE") == 50 + 40 + 0 + 50 + 15 + 20 + 40
     
     def test_checkout_AAAAAEEBAAABB(self):
-      assert sln.checkout("AAAAAEEBAAABBAAAAAAAAAABBCDDDBBDBBEEEDDD") == 200 + 40 + 40 + 0 + 130 + 45 
+      assert sln.checkout("AAAAAEEBAAABB") == 200 + 40 + 40 + 0 + 130 + 45 
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa") == -1 
+
 
 
 
