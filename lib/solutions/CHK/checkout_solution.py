@@ -178,7 +178,12 @@ def find_best_deal(
         try:
             scenario = queue.get_nowait()
         except Empty:
-            break
+            for handle in handles:
+                handle.join(timeout=0)
+                if handle.is_alive():
+                    break
+            else:
+                break
         
         handle = multiprocessing.Process(target=process_scenario, args=(queue, scenario,))
         handle.start()
@@ -208,6 +213,7 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
 
 if __name__ == "__main__":
     print(checkout("AAA"))
+
 
 
 
