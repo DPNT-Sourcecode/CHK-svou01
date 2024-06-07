@@ -1,6 +1,6 @@
 Timer unit: 1e-09 s
 
-Total time: 0.010104 s
+Total time: 0.010055 s
 File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
 Function: quantities_geq at line 25
 
@@ -9,12 +9,12 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     25                                           @cache
     26                                           @line_profiler.profile
     27                                           def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
-    28     33023    5084000.0    154.0     50.3      for sku, quantity in rhs.items():
-    29     16649    3153000.0    189.4     31.2          if sku not in lhs or lhs[sku] < quantity:
-    30       275      61000.0    221.8      0.6              return False
-    31     16374    1806000.0    110.3     17.9      return True
+    28     32889    4972000.0    151.2     49.4      for sku, quantity in rhs.items():
+    29     16581    3252000.0    196.1     32.3          if sku not in lhs or lhs[sku] < quantity:
+    30       273      67000.0    245.4      0.7              return False
+    31     16308    1764000.0    108.2     17.5      return True
 
-Total time: 4.42137 s
+Total time: 4.43316 s
 File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
 Function: process_scenario at line 126
 
@@ -26,36 +26,36 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    129                                               job_queue: multiprocessing.Queue,
    130                                               result_queue: multiprocessing.Queue,
    131                                           ) -> None:
-   132      3060    3459000.0   1130.4      0.1      if all(quantity == 0 for quantity in scenario.quantities.values()):
+   132      3031    3855000.0   1271.9      0.1      if all(quantity == 0 for quantity in scenario.quantities.values()):
    133                                                   result_queue.put(scenario.deal)
    134                                                   return
    135                                           
-   136      6120   70925000.0  11589.1      1.6      applicable_offers = list(
-   137      3060     360000.0    117.6      0.0          offer for offer in scenario.available_offers if quantities_geq(
+   136      6062   70551000.0  11638.2      1.6      applicable_offers = list(
+   137      3031     375000.0    123.7      0.0          offer for offer in scenario.available_offers if quantities_geq(
    138                                                       scenario.quantities,
    139                                                       offer.requires_quantities
    140                                                   )
    141                                               )
    142                                           
-   143     54466   13198000.0    242.3      0.3      for offer in applicable_offers:
-   144     51407   16125000.0    313.7      0.4          new_quantities = scenario.quantities.copy()
-   145    105843   24602000.0    232.4      0.6          for included_sku, included_quantity in offer.includes.items():
-   146     54436    8364000.0    153.6      0.2              if included_sku in new_quantities:
-   147    108872   23082000.0    212.0      0.5                  new_quantities = new_quantities.set(
-   148     54436    5036000.0     92.5      0.1                      included_sku,
-   149    108872   20577000.0    189.0      0.5                      max(
-   150     54436    5182000.0     95.2      0.1                          0,
-   151     54436    9639000.0    177.1      0.2                          new_quantities.get(included_sku) - included_quantity
+   143     53942   12014000.0    222.7      0.3      for offer in applicable_offers:
+   144     50912   16955000.0    333.0      0.4          new_quantities = scenario.quantities.copy()
+   145    104793   23681000.0    226.0      0.5          for included_sku, included_quantity in offer.includes.items():
+   146     53881    8207000.0    152.3      0.2              if included_sku in new_quantities:
+   147    107762   22948000.0    213.0      0.5                  new_quantities = new_quantities.set(
+   148     53881    5052000.0     93.8      0.1                      included_sku,
+   149    107762   20389000.0    189.2      0.5                      max(
+   150     53881    5609000.0    104.1      0.1                          0,
+   151     53881    9960000.0    184.9      0.2                          new_quantities.get(included_sku) - included_quantity
    152                                                               )
    153                                                           )
    154                                                   
-   155    102814 4200843000.0  40858.7     95.0          job_queue.put_nowait(Scenario(
-   156     51407    6836000.0    133.0      0.2              frozendict(new_quantities),
-   157     51407    8727000.0    169.8      0.2              [offer, *scenario.deal],
-   158     51407    4416000.0     85.9      0.1              applicable_offers
+   155    101824 4213835000.0  41383.5     95.1          job_queue.put(Scenario(
+   156     50912    6989000.0    137.3      0.2              frozendict(new_quantities),
+   157     50912    8186000.0    160.8      0.2              [offer, *scenario.deal],
+   158     50912    4554000.0     89.4      0.1              applicable_offers
    159                                                   ))
 
-Total time: 4.9084 s
+Total time: 4.91483 s
 File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
 Function: find_best_deal at line 161
 
@@ -70,24 +70,24 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    167                                           ) -> Optional[Deal]:
    168                                               
    169                                           
-   170         1   70375000.0    7e+07      1.4      manager = multiprocessing.Manager()
-   171         1    1378000.0    1e+06      0.0      job_queue = manager.Queue()
-   172         1     521000.0 521000.0      0.0      result_queue = manager.Queue()
+   170         1   71102000.0    7e+07      1.4      manager = multiprocessing.Manager()
+   171         1    1025000.0    1e+06      0.0      job_queue = manager.Queue()
+   172         1     401000.0 401000.0      0.0      result_queue = manager.Queue()
    173                                               
-   174         1     400000.0 400000.0      0.0      job_queue.put(Scenario(quantities, [], offers))
+   174         1     315000.0 315000.0      0.0      job_queue.put(Scenario(quantities, [], offers))
    175                                           
-   176         1       6000.0   6000.0      0.0      best_price = math.inf
+   176         1       4000.0   4000.0      0.0      best_price = math.inf
    177         1          0.0      0.0      0.0      best_deal = None
    178                                           
    179         1          0.0      0.0      0.0      handles = []
    180                                           
-   181         2   28758000.0    1e+07      0.6      with multiprocessing.Pool() as pool:
-   182      3060     755000.0    246.7      0.0          while True:
-   183      3060     328000.0    107.2      0.0              try:
-   184      3060  239938000.0  78411.1      4.9                  scenario = job_queue.get_nowait()
+   181         2   12495000.0    6e+06      0.3      with multiprocessing.Pool() as pool:
+   182      3031     747000.0    246.5      0.0          while True:
+   183      3031     291000.0     96.0      0.0              try:
+   184      3031  248182000.0  81881.2      5.0                  scenario = job_queue.get_nowait()
    185                                           
-   186      3060     561000.0    183.3      0.0                  if sync:
-   187      3060 4565380000.0    1e+06     93.0                      process_scenario(scenario, job_queue, result_queue)
+   186      3031     529000.0    174.5      0.0                  if sync:
+   187      3031 4579740000.0    2e+06     93.2                      process_scenario(scenario, job_queue, result_queue)
    188                                                           else:
    189                                                               handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
    190                                                               handles.append(
@@ -113,6 +113,5 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    210                                               return best_deal
 
   0.01 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:25 - quantities_geq
-  4.42 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:126 - process_scenario
+  4.43 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:126 - process_scenario
   4.91 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:161 - find_best_deal
-

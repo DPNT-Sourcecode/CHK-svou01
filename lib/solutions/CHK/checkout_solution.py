@@ -184,11 +184,12 @@ def find_best_deal(
                 scenario = job_queue.get_nowait()
 
                 if sync:
-                    process_scenario()
-                handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
-                handles.append(
-                    handle
-                )
+                    process_scenario(scenario, job_queue, result_queue)
+                else:
+                    handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
+                    handles.append(
+                        handle
+                    )
             except Empty:
                 for handle in handles:
                     try:
@@ -209,10 +210,11 @@ def find_best_deal(
     return best_deal
 
 
-def checkout(skus: str, *, offers: set[Offer] = OFFERS):
+def checkout(skus: str, *, offers: set[Offer] = OFFERS, sync: bool = False):
     best_deal = find_best_deal(
         get_quantities(skus),
-        offers=offers
+        offers=offers,
+        sync=sync,
     )
 
     if best_deal is None:
@@ -221,5 +223,5 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO"))
+    print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO", sync=True))
 

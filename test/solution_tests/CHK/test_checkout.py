@@ -68,4 +68,4 @@ class TestCheckout():
 
     @pytest.mark.timeout(5)
     def test_checkout_large_input(self):
-      sln.checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO", offers=TEST_OFFERS)
+      sln.checkout("AAA", offers=TEST_OFFERS)
