@@ -1,0 +1,56 @@
+Timer unit: 1e-09 s
+
+Total time: 5.06701 s
+File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
+Function: find_best_deal at line 160
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   160                                           @line_profiler.profile
+   161                                           def find_best_deal(
+   162                                               quantities: Quantities,
+   163                                               *,
+   164                                               offers: Iterable[Offer] = OFFERS,
+   165                                           ) -> Optional[Deal]:
+   166                                               
+   167                                           
+   168         1   52564000.0    5e+07      1.0      manager = multiprocessing.Manager()
+   169         1    1104000.0    1e+06      0.0      job_queue = manager.Queue()
+   170         1     662000.0 662000.0      0.0      result_queue = manager.Queue()
+   171                                               
+   172         1     396000.0 396000.0      0.0      job_queue.put(Scenario(quantities, [], offers))
+   173                                           
+   174         1       3000.0   3000.0      0.0      best_price = math.inf
+   175         1       1000.0   1000.0      0.0      best_deal = None
+   176                                           
+   177         1          0.0      0.0      0.0      handles = []
+   178                                           
+   179         2  149911000.0    7e+07      3.0      with multiprocessing.Pool() as pool:
+   180     10628    3196000.0    300.7      0.1          while True:
+   181     10628    1481000.0    139.3      0.0              try:
+   182     10628 4762044000.0 448065.9     94.0                  scenario = job_queue.get_nowait()
+   183                                           
+   184     10482   85495000.0   8156.4      1.7                  handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
+   185     20964    5857000.0    279.4      0.1                  handles.append(
+   186     10482    1530000.0    146.0      0.0                      handle
+   187                                                           )
+   188       146     208000.0   1424.7      0.0              except Empty:
+   189       149      70000.0    469.8      0.0                  for handle in handles:
+   190       149      24000.0    161.1      0.0                      try:
+   191       149    2251000.0  15107.4      0.0                          handle.get(timeout=0)
+   192       145     105000.0    724.1      0.0                      except multiprocessing.context.TimeoutError:
+   193       145     107000.0    737.9      0.0                          break
+   194                                                           else:
+   195                                                               break
+   196                                                       
+   197                                               pool.join()
+   198                                               
+   199                                               while not result_queue.empty():
+   200                                                   deal = result_queue.get()
+   201                                                   if deal is not None and (price := get_deal_price(deal)) < best_price:
+   202                                                       best_price = price
+   203                                                       best_deal = deal
+   204                                           
+   205                                               return best_deal
+
+  5.07 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:160 - find_best_deal

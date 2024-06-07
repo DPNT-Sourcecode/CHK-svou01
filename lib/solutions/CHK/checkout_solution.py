@@ -123,6 +123,7 @@ class Scenario:
     deal: Deal
     available_offers: set[Offer]
 
+@line_profiler.profile
 def process_scenario(
     scenario: Scenario,
     job_queue: multiprocessing.Queue,
@@ -162,6 +163,7 @@ def find_best_deal(
     quantities: Quantities,
     *,
     offers: Iterable[Offer] = OFFERS,
+    sync: bool = False
 ) -> Optional[Deal]:
     
 
@@ -181,21 +183,22 @@ def find_best_deal(
             try:
                 scenario = job_queue.get_nowait()
 
+                if sync:
+                    process_scenario()
                 handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
                 handles.append(
                     handle
                 )
             except Empty:
                 for handle in handles:
-                    handle.join(timeout=0)
-                    if handle.is_alive():
+                    try:
+                        handle.get(timeout=0)
+                    except multiprocessing.context.TimeoutError:
                         break
                 else:
                     break
             
-
-        for handle in handles:
-            deal = handle.join()
+    pool.join()
     
     while not result_queue.empty():
         deal = result_queue.get()
@@ -218,4 +221,5 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("AAABADC"))
+    print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO"))
+

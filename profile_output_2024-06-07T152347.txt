@@ -1,0 +1,17 @@
+Timer unit: 1e-09 s
+
+Total time: 0.00301 s
+File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
+Function: quantities_geq at line 25
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    25                                           @cache
+    26                                           @line_profiler.profile
+    27                                           def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
+    28      7405    1490000.0    201.2     49.5      for sku, quantity in rhs.items():
+    29      3714     993000.0    267.4     33.0          if sku not in lhs or lhs[sku] < quantity:
+    30        23       4000.0    173.9      0.1              return False
+    31      3691     523000.0    141.7     17.4      return True
+
+  0.00 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:25 - quantities_geq
