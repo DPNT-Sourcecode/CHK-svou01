@@ -37,5 +37,6 @@ class TestCheckout():
     
     @pytest.mark.timeout(5)
     def test_checkout_ABCDEFGHIJKLMNOPQRSTUVWXYZ(self):
-      assert sln.checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ") == 965
+      assert sln.checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ") == 965 - 21
+
 
