@@ -134,5 +134,6 @@ def checkout(skus: str) -> int:
     return total_price
 
 if __name__ == "__main__":
-    print(checkout("FF"))
+    print(sum(BASIC_PRICES.values()))
+
 
