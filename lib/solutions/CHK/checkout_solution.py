@@ -9,14 +9,14 @@ class PricePoint:
     quantity: int
     price: int
 
-PRICE_POINTS = set(
+PRICE_POINTS = set([
     PricePoint('A', 1, 50),
     PricePoint('A', 3, 130),
     PricePoint('B', 1, 30),
     PricePoint('B', 2, 45),
     PricePoint('C', 1, 20),
     PricePoint('D', 1, 15),
-)
+])
 
 def best_price_point(sku: str, quantity: int) -> PricePoint:
     """
@@ -24,9 +24,16 @@ def best_price_point(sku: str, quantity: int) -> PricePoint:
     the customer is buying at least `quantity` of the item.
     """
     price_points_for_sku = set(pp for pp in PRICE_POINTS if pp.sku == sku and pp.quantity >= quantity)
-    return min(price_points_for_sku, key=lambda pp: pp.price)
+    return min(price_points_for_sku, key=lambda pp: pp.price / pp.quantity)
 
-def checkout(skus):
+def checkout(skus: str):
+    quantities = {}
+    for sku in skus:
+        if sku not in quantities:
+            quantities[sku] = 0
+        quantities[sku] += 1
+    print(quantities)
     raise NotImplementedError()
+
 
 
