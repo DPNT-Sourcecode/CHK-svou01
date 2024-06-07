@@ -153,7 +153,7 @@ def find_best_deal(
 
         new_deal = FrozenList([offer, *rest_of_deal])
         new_deal.freeze()
-        
+
         if (new_deal_price := get_deal_price(new_deal)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
@@ -172,3 +172,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
         return -1
 
     return get_deal_price(best_deal)
+
+if __name__ == "__main__":
+    checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+
