@@ -3,13 +3,12 @@
 
 from dataclasses import dataclass
 from typing import Optional, Callable
-from frozendict import frozendict
 from frozenlist import FrozenList
 import math
 from functools import cache
 import line_profiler
 
-Quantities = frozendict[str, int]
+Quantities = dict[str, int]
 
 
 @dataclass(frozen=True)
@@ -24,6 +23,7 @@ Deal = FrozenList[Offer]
 @cache
 @line_profiler.profile
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
+    lhs
     for sku, quantity in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
             return False
@@ -35,25 +35,25 @@ def basic_price(sku: str, price: int) -> Offer:
 
 def bulk_discount(sku: str, quantity: int, price: int) -> Offer:
     return Offer(
-        frozendict({sku: quantity}),
-        frozendict({sku: quantity}),
+        {sku: quantity},
+        {sku: quantity},
         price
     )
 
 def buy_n_get_m_free(sku: str, quantity: int, reward_sku: str, reward_quantity: int, price: int) -> Offer:
     if sku == reward_sku:
         return Offer(
-            frozendict({sku: quantity}),
-            frozendict({sku: quantity + reward_quantity}),
+            {sku: quantity},
+            {sku: quantity + reward_quantity},
             price
         )
     else:
         return Offer(
-            frozendict({sku: quantity}),
-            frozendict({
+            {sku: quantity},
+            {
                 sku: quantity,
                 reward_sku: reward_quantity
-            }),
+            },
             price
         )
 
@@ -168,8 +168,3 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
-
-
-
-
-
