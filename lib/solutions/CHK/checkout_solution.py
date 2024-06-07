@@ -81,24 +81,35 @@ def checkout(skus: str) -> int:
     quantities_counting_towards_offers = {**quantities}
 
     # NOTE: I am making the assumption that there will be
-    #       no two offers of the form "Buy two X get "
-    for sku, offer in BUY_N_GET_M_FREE.items():
-        if sku not in quantities_counting_towards_offers:
-            continue
-        for quantity, reward in offer.items():
-            if quantities_counting_towards_offers[sku] >= quantity:
-                for reward_sku, reward_quantity in reward.items():
-                    if reward_sku in quantities:
-                        quantities[reward_sku] = max(
-                            0,
-                            quantities[reward_sku] - reward_quantity
-                        )
-                        quantities_counting_towards_offers[sku] -= quantity
+    #       no two offers of the form "Buy n X get m Y free"
+    #       for the same X and different Ys.
+    applied_offer = True
+    while applied_offer:
+        applied_offer = False
+        for sku, offer in BUY_N_GET_M_FREE.items():
+            if sku not in quantities_counting_towards_offers:
+                continue
+            for quantity, reward in offer.items():
+                if quantities_counting_towards_offers[sku] >= quantity:
+                    for reward_sku, reward_quantity in reward.items():
+                        if reward_sku in quantities:
+                            quantities[reward_sku] = max(
+                                0,
+                                quantities[reward_sku] - reward_quantity
+                            )
+                            quantities_counting_towards_offers[sku] -= quantity
+                            if reward_sku in quantities_counting_towards_offers:
+                                quantities_counting_towards_offers[reward_sku] = max(
+                                    0,
+                                    
+                                )
+                            applied_offer = True
     
     # for sku, offer in BULK_DISCOUNTS.items():
     #     if sku not in quantities:
     #         continue
     print(quantities)
+    print(quantities_counting_towards_offers)
 
 if __name__ == "__main__":
     print(checkout("FFFFFF"))
