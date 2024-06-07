@@ -6,7 +6,7 @@ from typing import Optional, Callable
 from frozendict import frozendict
 from frozenlist import FrozenList
 import math
-from functools import lru_cache
+from functools import cache
 
 Quantities = frozendict[str, int]
 
@@ -21,7 +21,7 @@ class Offer:
 Deal = FrozenList[Offer]
 
 
-@lru_cache(maxsize=None)
+@cache
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for sku, quantity in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
@@ -108,12 +108,12 @@ OFFERS = frozenset(
 )
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_deal_price(deal: Deal) -> int:
     return sum(offer.price for offer in deal)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_quantities(skus: str) -> Quantities:
     quantities = {}
     for sku in skus:
@@ -123,13 +123,12 @@ def get_quantities(skus: str) -> Quantities:
     return frozendict(quantities)
 
 
-@lru_cache(maxsize=None)
+@cache
 def find_best_deal(
     quantities: Quantities,
     *,
     offers: frozenset[Offer] = OFFERS
 ) -> Optional[Deal]:
-    global indent
     if all(quantity == 0 for quantity in quantities.values()):
         empty = FrozenList([])
         empty.freeze()
@@ -160,7 +159,7 @@ def find_best_deal(
     return best_deal
 
 
-@lru_cache(maxsize=None)
+@cache
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     best_deal = find_best_deal(
         get_quantities(skus),
