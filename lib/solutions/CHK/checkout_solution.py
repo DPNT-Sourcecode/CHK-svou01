@@ -160,7 +160,7 @@ def find_best_deal(
         with Pool(5) as pool:
             results = pool.map(deal_finder, applicable_offers)
     
-    
+    print(type(results))
     results = filter(results, lambda result: result is not None)
 
     if len(results) == 0:
@@ -181,3 +181,4 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
