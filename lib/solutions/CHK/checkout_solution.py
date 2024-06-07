@@ -4,17 +4,20 @@
 from dataclasses import dataclass
 from typing import Optional
 
+Quantities = dict[str, int]
 
 @dataclass(frozen=True)
 class Offer:
-    does_qualify: 
-    quantity: int
+    does_qualify: Callable[[Quantities], bool]
+    includes: Quantities
     price: int
 
+def requires_quantity(*quantities: list[Quantities]) -> Callable[[Quantities], bool]:
+    return lambda 
 
-PRICE_POINTS = set(
+OFFERS = set(
     [
-        PricePoint("A", 1, 50),
+        Offer("A", 1, 50),
         PricePoint("A", 3, 130),
         PricePoint("B", 1, 30),
         PricePoint("B", 2, 45),
@@ -56,4 +59,5 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
