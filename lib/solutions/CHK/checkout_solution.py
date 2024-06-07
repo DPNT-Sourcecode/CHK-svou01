@@ -52,15 +52,17 @@ def get_quantities(skus: str) -> Quantities:
 
 indent = 0
 def find_best_deal(quantities: Quantities) -> Optional[Deal]:
+    global indent
     if all(quantity == 0 for quantity in quantities.values()):
         return []
     
+    indent += 2
     applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
     
     best_deal = None
     best_price = math.inf
     for offer in applicable_offers:
-        print(ind)
+        print(" "*indent + "OFFER" + str(offer.includes))
         new_quantities = {**quantities}
         for (included_sku, included_quantity) in offer.includes.items():
             if included_sku in new_quantities:
@@ -69,14 +71,14 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
                     new_quantities[included_sku] - included_quantity
                 )
         new_quantities = frozendict(new_quantities)
-        print(offer)
-        print(new_quantities)
 
         new_deal = [offer, *find_best_deal(new_quantities)]
+        print(" "*indent + "BEST" + str(new_deal))
         if (new_deal_price := (get_deal_price(new_deal) + offer.price)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
     
+    indent -= 2
     return best_deal
 
 def checkout(skus: str):
@@ -87,5 +89,6 @@ def checkout(skus: str):
     print(best_deal)
     
     return get_deal_price(best_deal)
+
 
 
