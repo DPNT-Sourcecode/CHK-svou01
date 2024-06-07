@@ -155,8 +155,19 @@ def find_best_deal_helper(
     queue = Queue()
     queue.enqueue(Scenario(quantities, set(), offers))
 
+    best_price = math.infinity
+    best_deal = None
+
     while not queue.isEmpty():
         scenario = queue.get()
+
+        if all(quantity == 0 for quantity in scenario.quantities.values()):
+            deal = FrozenList(list(scenario.applied_offers))
+            deal.freeze()
+            price = get_deal_price(deal)
+            if price < best_price:
+                best_price = price
+                best_deal = deal
 
         applicable_offers = frozenset(
             offer for offer in scenario.available_offers if quantities_geq(
@@ -175,7 +186,8 @@ def find_best_deal_helper(
 
             queue.enqueue(Scenario(
                 frozendict(new_quantities),
-                set([])
+                set([offer]).union(scenario.applied_offers),
+                applicable_offers
             ))
 
 
@@ -222,6 +234,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
