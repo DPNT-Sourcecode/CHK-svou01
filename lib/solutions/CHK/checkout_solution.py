@@ -56,7 +56,7 @@ BULK_DISCOUNTS = {
         5: 45,
     },
     "K": {
-        2: 150
+        2: 120
     },
     "P": {
         5: 200
@@ -185,10 +185,3 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-
-
-
-
-
-
-

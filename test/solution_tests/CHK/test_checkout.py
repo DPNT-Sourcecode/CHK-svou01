@@ -42,5 +42,11 @@ class TestCheckout():
     def test_STX(self):
       assert sln.checkout("STX") == 45
 
-
-
+    def test_KK(self):
+      assert sln.checkout("KK") == 120
+    
+    def test_KKK(self):
+      assert sln.checkout("KKK") == 190
+    
+    def test_KKKK(self):
+      assert sln.checkout("KKKK") == 240
