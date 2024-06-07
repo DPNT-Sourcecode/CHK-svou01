@@ -46,13 +46,23 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
         return []
     
     applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
-    if len(applicable_offers) == 0:
-        return None
     
     best_deal = None
     best_price = math.inf
     for offer in applicable_offers:
-        
+        new_quantities = {**quantities}
+        for (included_sku, included_quantity) in offer.includes:
+            if included_sku in new_quantities:
+                new_quantities[included_sku] = max(
+                    0,
+                    new_quantities[included_sku] - included_quantity
+                )
+        new_deal = find_best_deal(new_quantities)
+        if (new_deal_price := get_deal_price(deal)) < best_price:
+            best_price = new_deal_price
+            best_deal = new_deal
+    
+    return best_deal
 
 def checkout(skus: str):
     quantities = {}
@@ -71,6 +81,7 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
 
 
