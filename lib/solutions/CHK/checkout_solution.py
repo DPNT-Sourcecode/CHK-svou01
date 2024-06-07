@@ -44,6 +44,19 @@ def bulk_discount(sku: str, quantity: int, price: int) -> Offer:
         price
     )
 
+def buy_n_get_m_free(sku: str, quantity: int, reward_sku: str, reward_quantity: int, price: int) -> Offer:
+    if sku == reward_sku:
+        return Offer(
+            requires_quantities(frozendict({sku: quantity})),
+            frozendict({sku: quantity + reward_quantity}),
+            80
+        )
+    else:
+        return Offer(
+            requires_quantities(frozendict({sku: quantity})),
+            frozendict({sku: quantity, reward_sku: reward_quantity}),
+            80
+        ),
 
 OFFERS = frozenset(
     [
@@ -71,12 +84,14 @@ OFFERS = frozenset(
         basic_price("P", 50),
         bulk_discount("P", 5, 200),
         basic_price("Q", 30),
-        bulk_discount("Q", 30),
+        bulk_discount("Q", 3, 80),
         basic_price("R", 50),
         basic_price("S", 30),
         basic_price("T", 20),
         basic_price("U", 40),
         basic_price("V", 50),
+        bulk_discount("V", 2, 90),
+        bulk_discount("V", 3, 130),
         basic_price("W", 20),
         basic_price("X", 90),
         basic_price("Y", 10),
@@ -148,6 +163,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
         return -1
 
     return get_deal_price(best_deal)
+
 
 
 
