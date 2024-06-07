@@ -78,9 +78,23 @@ BUY_N_GET_M_FREE = {
 
 def checkout(skus: str) -> int:
     quantities = get_quantities(skus)
-
-    for sku, offer in buy_n_get_m_free.items():
-        if 
+    
+    for sku, offer in BUY_N_GET_M_FREE.items():
+        if sku not in quantities:
+            continue
+        for quantity, reward in offer.items():
+            if quantities[sku] >= quantity:
+                for reward_sku, reward_quantity in reward.items():
+                    if reward_sku in quantities:
+                        quantities[reward_sku] = max(
+                            0,
+                            quantities[reward_sku] - reward_quantity
+                        )
+    
+    # for sku, offer in BULK_DISCOUNTS.items():
+    #     if sku not in quantities:
+    #         continue
+    print(quantities)
 
 if __name__ == "__main__":
-    print(checkout("A"))
+    print(checkout("FFFFFF"))
