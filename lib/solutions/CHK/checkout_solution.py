@@ -78,18 +78,22 @@ BUY_N_GET_M_FREE = {
 
 def checkout(skus: str) -> int:
     quantities = get_quantities(skus)
-    
+    quantities_counting_towards_offers = {**quantities}
+
+    # NOTE: I am making the assumption that there will be
+    #       no two offers of the form "Buy two X get "
     for sku, offer in BUY_N_GET_M_FREE.items():
-        if sku not in quantities:
+        if sku not in quantities_counting_towards_offers:
             continue
         for quantity, reward in offer.items():
-            if quantities[sku] >= quantity:
+            if quantities_counting_towards_offers[sku] >= quantity:
                 for reward_sku, reward_quantity in reward.items():
                     if reward_sku in quantities:
                         quantities[reward_sku] = max(
                             0,
                             quantities[reward_sku] - reward_quantity
                         )
+                        quantities_counting_towards_offers[sku] -= quantity
     
     # for sku, offer in BULK_DISCOUNTS.items():
     #     if sku not in quantities:
