@@ -22,6 +22,7 @@ class Offer:
 Deal = FrozenList[Offer]
 
 @cache
+@line_profiler.profile
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for sku, quantity in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
@@ -167,6 +168,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+
 
 
 
