@@ -12,8 +12,14 @@ class Offer:
     includes: Quantities
     price: int
 
-def requires_quantity(*quantities: list[Quantities]) -> Callable[[Quantities], bool]:
-    return lambda 
+def quantity_geq(lhs: Quantities, rhs: Quantities) -> bool:
+    for (sku, quantity) in rhs.items():
+        if sku not in lhs or lhs[sku] < quantity:
+            return False
+    return True
+
+def requires_quantity(required_quantity: Quantities) -> Callable[[Quantities], bool]:
+    return lambda q: quantity_geq(q, required_quantity)
 
 OFFERS = set(
     [
@@ -59,5 +65,6 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
 
