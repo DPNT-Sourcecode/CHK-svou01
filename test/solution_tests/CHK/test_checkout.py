@@ -48,8 +48,4 @@ class TestCheckout():
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa", offers=TEST_OFFERS) == -1 
-
-
-
-
-
+      assert sln.checkout("AxA", offers=TEST_OFFERS) == -1 

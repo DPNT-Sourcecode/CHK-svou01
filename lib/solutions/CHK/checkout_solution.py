@@ -96,6 +96,7 @@ OFFERS = frozenset(
         basic_price("S", 30),
         basic_price("T", 20),
         basic_price("U", 40),
+        buy_n_get_m_free("U", 3, "U", 1, 120),
         basic_price("V", 50),
         bulk_discount("V", 2, 90),
         bulk_discount("V", 3, 130),
@@ -170,11 +171,3 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
         return -1
 
     return get_deal_price(best_deal)
-
-
-
-
-
-
-
-
