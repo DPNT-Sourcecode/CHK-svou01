@@ -176,26 +176,26 @@ def find_best_deal(
 
     handles = []
 
-    while True:
-        try:
-            scenario = job_queue.get_nowait()
+    with multiprocessing.Pool() as pool:
+        while True:
+            try:
+                scenario = job_queue.get_nowait()
 
-            handle = multiprocessing.Process(target=process_scenario, args=(scenario, job_queue, result_queue))
-            handle.start()
-            handles.append(
-                handle
-            )
-        except Empty:
-            for handle in handles:
-                handle.join(timeout=0)
-                if handle.is_alive():
+                handle = pool.apply_async(process_scenario, (scenario, job_queue, result_queue))
+                handles.append(
+                    handle
+                )
+            except Empty:
+                for handle in handles:
+                    handle.join(timeout=0)
+                    if handle.is_alive():
+                        break
+                else:
                     break
-            else:
-                break
-        
+            
 
-    for handle in handles:
-        deal = handle.join()
+        for handle in handles:
+            deal = handle.join()
     
     while not result_queue.empty():
         deal = result_queue.get()
