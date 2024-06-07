@@ -8,7 +8,7 @@ from frozenlist import FrozenList
 import math
 from functools import cache, partial
 import line_profiler
-from queue import Queue
+from queue import Queue, Empty
 from multiprocessing import Pool
 
 Quantities = frozendict[str, int]
@@ -136,8 +136,13 @@ def find_best_deal(
     best_price = math.inf
     best_deal = None
 
-    while not queue.empty():
-        scenario = queue.get()
+    while True:
+        try:
+            scenario = queue.get_nowait()
+        except Empty:
+            break
+            
+        print(scenario.quantities)
 
         if all(quantity == 0 for quantity in scenario.quantities.values()):
             deal = FrozenList(list(scenario.applied_offers))
@@ -184,7 +189,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    checkout("A")
 
 
 
