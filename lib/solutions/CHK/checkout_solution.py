@@ -12,44 +12,38 @@ class Offer:
     includes: Quantities
     price: int
 
-def quantity_geq(lhs: Quantities, rhs: Quantities) -> bool:
+def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for (sku, quantity) in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
             return False
     return True
 
-def requires_quantity(required_quantity: Quantities) -> Callable[[Quantities], bool]:
-    return lambda q: quantity_geq(q, required_quantity)
+def requires_quantities(required_quantities: Quantities) -> Callable[[Quantities], bool]:
+    return lambda quantities: quantities_geq(quantities, required_quantities)
 
 OFFERS = set(
     [
-        Offer(requires_quantity({"A": 1}), {"A": 1}, 50),
-        Offer(requires_quantity({"A": 3}), {"A": 3}, 120),
-        Offer(requires_quantity({"A": 5}), {"A": 5}, 200),
-        Offer(requires_quantity({"B": 1}), {"B": 1}, 30),
-        Offer(requires_quantity({"B": 2}), {"B": 2}, 45),
-        Offer(requires_quantity({"C": 1}), {"C": 1}, 20),
-        Offer(requires_quantity({"D": 1}), {"D": 1}, 15),
-        Offer(requires_quantity({"E": 1}), {"E": 1}, 40),
-        Offer(requires_quantity({"E": 2}), {"E": 2, "B": 1}, 80),
+        Offer(requires_quantities({"A": 1}), {"A": 1}, 50),
+        Offer(requires_quantities({"A": 3}), {"A": 3}, 120),
+        Offer(requires_quantities({"A": 5}), {"A": 5}, 200),
+        Offer(requires_quantities({"B": 1}), {"B": 1}, 30),
+        Offer(requires_quantities({"B": 2}), {"B": 2}, 45),
+        Offer(requires_quantities({"C": 1}), {"C": 1}, 20),
+        Offer(requires_quantities({"D": 1}), {"D": 1}, 15),
+        Offer(requires_quantities({"E": 1}), {"E": 1}, 40),
+        Offer(requires_quantities({"E": 2}), {"E": 2, "B": 1}, 80),
     ]
 )
 
-
-def best_price_point(sku: str, quantity: int) -> Optional[PricePoint]:
-    """
-    Returns the best price for the given SKU, given that
-    the customer is buying at least `quantity` of the item.
-
-    Returns `None` if there does not exist such a price point
-    """
-    price_points_for_sku = set(
-        pp for pp in PRICE_POINTS if pp.sku == sku and pp.quantity <= quantity
-    )
-    if len(price_points_for_sku) == 0:
+def find_best_deal(quantities: Quantities) -> Optional[int]:
+    if all(quantity == 0 for quantity in quantities.values()):
+        return 0
+    
+    applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
+    if len(applicable_offers) == 0:
         return None
-    return min(price_points_for_sku, key=lambda pp: pp.price / pp.quantity)
-
+    
+    
 
 def checkout(skus: str):
     quantities = {}
@@ -68,6 +62,7 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
 
 
