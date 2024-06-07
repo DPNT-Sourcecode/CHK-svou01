@@ -6,8 +6,8 @@ from typing import Optional
 
 
 @dataclass(frozen=True)
-class PricePoint:
-    sku: str
+class Offer:
+    does_qualify: 
     quantity: int
     price: int
 
@@ -56,3 +56,4 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
