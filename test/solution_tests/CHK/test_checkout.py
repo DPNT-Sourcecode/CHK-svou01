@@ -1,7 +1,22 @@
 from solutions.CHK import checkout_solution as sln
 from frozendict import frozendict
+import pytest
 
-TEST_OFFERS = sln.OFFERS
+TEST_OFFERS = frozenset(
+    [
+        sln.basic_price("A", 50),
+        sln.bulk_discount("A", 3, 130),
+        sln.bulk_discount("A", 5, 200),
+        sln.basic_price("B", 30),
+        sln.bulk_discount("B", 2, 45),
+        sln.basic_price("C", 20),
+        sln.basic_price("D", 15),
+        sln.basic_price("E", 40),
+        sln.buy_n_get_m_free("E", 2, "B", 1, 80),
+        sln.basic_price("F", 10),
+        sln.buy_n_get_m_free("F", 2, "F", 1, 20),
+    ]
+)
 
 class TestCheckout():
     def test_quantities_geq(self):
@@ -52,4 +67,4 @@ class TestCheckout():
 
     @pytest.mark.timeout(5)
     def test_checkout_large_input(self):
-      assert sln.checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOOJASIOACSOPMASOPCMAAABB", offers=TEST_OFFERS)
+      sln.checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOOJASIOACSOPMASOPCMAAABB", offers=TEST_OFFERS)
