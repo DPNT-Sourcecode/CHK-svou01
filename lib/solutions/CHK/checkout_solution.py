@@ -153,10 +153,14 @@ def find_best_deal(
 
     applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
 
-    deal_finder = 
-    with Pool(5) as pool:
-        results = pool.map(partial(find_best_deal_applying_offer, quantities, applicable_offers), applicable_offers)
-
+    deal_finder = partial(find_best_deal_applying_offer, quantities, applicable_offers)
+    if daemonic:
+        results = (deal_finder(offer) for offer in applicable_offers)
+    else:
+        with Pool(5) as pool:
+            results = pool.map(deal_finder, applicable_offers)
+    
+    
     results = filter(results, lambda result: result is not None)
 
     if len(results) == 0:
