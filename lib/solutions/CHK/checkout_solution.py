@@ -88,6 +88,10 @@ BUY_N_GET_M_FREE = {
     }
 }
 
+BUNDLES = {
+    "STXYZ": 45
+}
+
 def checkout(skus: str) -> int:
     quantities = get_quantities(skus)
     quantities_counting_towards_offers = {**quantities}
@@ -144,4 +148,5 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("UUUU"))
+
 
