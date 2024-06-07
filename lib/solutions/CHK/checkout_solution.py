@@ -143,15 +143,25 @@ def checkout(skus: str) -> int:
     # NOTE: Assuming that no SKU in a bundle
     #       has any other deals which applies to it.
     #       There is a test to make sure of this
-    for bundle in BUNDLES:
-        matched_quantity = 0
-        for sku in bundle:
-            if sku in quantities:
-                matched_quantity += quantities[sku]
-                if matched_quantity >= BUNDLE_THRESHOLD:
-                    break
-        else:
+    applied_bundle = True
+    while applied_bundle:
+        applied_bundle = False
+        for bundle in BUNDLES:
+            matched_quantity = 0
+            for sku in bundle:
+                if sku in quantities:
+                    matched_quantity += quantities[sku]
+                    if matched_quantity >= BUNDLE_THRESHOLD:
+                        break
             
+            if matched_quantity < BUNDLE_THRESHOLD:
+                continue
+
+            items_by_price = sorted(bundle, key=lambda sku: BASIC_PRICES[sku], reverse=True)
+            discounted_quantity = 0
+            while discounted_quantity < BUNDLE_THRESHOLD:
+                
+                to_discount = min(quantities[])
     
     for sku, quantity in quantities.items():
         if sku not in BASIC_PRICES:
@@ -162,6 +172,7 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("UUUU"))
+
 
 
 
