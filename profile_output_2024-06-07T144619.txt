@@ -1,0 +1,84 @@
+Timer unit: 1e-09 s
+
+Total time: 2.7e-05 s
+File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
+Function: quantities_geq at line 26
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    26                                           @cache
+    27                                           @line_profiler.profile
+    28                                           def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
+    29        58       8000.0    137.9     29.6      for sku, quantity in rhs.items():
+    30        41      10000.0    243.9     37.0          if sku not in lhs or lhs[sku] < quantity:
+    31        24       6000.0    250.0     22.2              return False
+    32        17       3000.0    176.5     11.1      return True
+
+Total time: 3.44608 s
+File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
+Function: find_best_deal at line 120
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   120                                           @line_profiler.profile
+   121                                           def find_best_deal(
+   122                                               quantities: Quantities,
+   123                                               *,
+   124                                               offers: frozenset[Offer] = OFFERS,
+   125                                           ) -> Optional[Deal]:
+   126                                           
+   127         1       1000.0   1000.0      0.0      @dataclass
+   128         1     359000.0 359000.0      0.0      class Scenario:
+   129                                                   quantities: Quantities
+   130                                                   deal: Deal
+   131                                                   available_offers: frozenset[Offer]
+   132                                               
+   133         1       1000.0   1000.0      0.0      queue = SimpleQueue()
+   134         1       1000.0   1000.0      0.0      empty = FrozenList([])
+   135         1       1000.0   1000.0      0.0      empty.freeze()
+   136         1       1000.0   1000.0      0.0      queue.put(Scenario(quantities, empty, offers))
+   137                                           
+   138         1          0.0      0.0      0.0      best_price = math.inf
+   139         1          0.0      0.0      0.0      best_deal = None
+   140                                           
+   141     47217   10695000.0    226.5      0.3      while True:
+   142     47217    3868000.0     81.9      0.1          try:
+   143     47217   10882000.0    230.5      0.3              scenario = queue.get_nowait()
+   144                                                   except Empty:
+   145                                                       break
+   146                                                       
+   147     47217   31660000.0    670.5      0.9          if all(quantity == 0 for quantity in scenario.quantities.values()):
+   148                                                       price = get_deal_price(scenario.deal)
+   149                                                       if price < best_price:
+   150                                                           best_price = price
+   151                                                           best_deal = scenario.deal
+   152                                                       continue
+   153                                           
+   154     94434  404641000.0   4284.9     11.7          applicable_offers = frozenset(
+   155     47217    5173000.0    109.6      0.2              offer for offer in scenario.available_offers if quantities_geq(
+   156                                                           scenario.quantities,
+   157                                                           offer.requires_quantities
+   158                                                       )
+   159                                                   )
+   160                                           
+   161    849889  122326000.0    143.9      3.5          for offer in applicable_offers:
+   162    802673  116804000.0    145.5      3.4              new_quantities = scenario.quantities.copy()
+   163   1652562  432431000.0    261.7     12.5              for included_sku, included_quantity in offer.includes.items():
+   164    849889   93815000.0    110.4      2.7                  if included_sku in new_quantities:
+   165   1699778  820168000.0    482.5     23.8                      new_quantities.set(included_sku, max(
+   166    849889  103972000.0    122.3      3.0                          0, new_quantities[included_sku] - included_quantity
+   167                                                               ))
+   168                                                       
+   169    802673  263527000.0    328.3      7.6              new_deal = FrozenList([offer, *scenario.deal])
+   170    802673  111301000.0    138.7      3.2              new_deal.freeze()
+   171                                           
+   172   1605345  693532000.0    432.0     20.1              queue.put(Scenario(
+   173    802673   88256000.0    110.0      2.6                  frozendict(new_quantities),
+   174    802672   69770000.0     86.9      2.0                  new_deal,
+   175    802672   62897000.0     78.4      1.8                  applicable_offers
+   176                                                       ))
+   177                                           
+   178                                               return best_deal
+
+  0.00 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:26 - quantities_geq
+  3.45 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:120 - find_best_deal

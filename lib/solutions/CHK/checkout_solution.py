@@ -2,9 +2,8 @@
 # skus = unicode string
 
 from dataclasses import dataclass
-from typing import Optional, Callable, Tuple
+from typing import Optional, Tuple, Iterable
 from frozendict import frozendict
-from frozenlist import FrozenList
 import math
 from functools import cache, partial
 import line_profiler
@@ -21,7 +20,7 @@ class Offer:
     price: int
 
 
-Deal = FrozenList[Offer]
+Deal = list[Offer]
 
 @cache
 @line_profiler.profile
@@ -59,7 +58,7 @@ def buy_n_get_m_free(sku: str, quantity: int, reward_sku: str, reward_quantity: 
             price
         )
 
-OFFERS = frozenset(
+OFFERS = set(
     [
         basic_price("A", 50),
         bulk_discount("A", 3, 130),
@@ -121,19 +120,17 @@ def get_quantities(skus: str) -> Quantities:
 def find_best_deal(
     quantities: Quantities,
     *,
-    offers: frozenset[Offer] = OFFERS,
+    offers: Iterable[Offer] = OFFERS,
 ) -> Optional[Deal]:
 
     @dataclass
     class Scenario:
         quantities: Quantities
         deal: Deal
-        available_offers: frozenset[Offer]
+        available_offers: set[Offer]
     
     queue = SimpleQueue()
-    empty = FrozenList([])
-    empty.freeze()
-    queue.put(Scenario(quantities, empty, offers))
+    queue.put(Scenario(quantities, [], offers))
 
     best_price = math.inf
     best_deal = None
@@ -151,7 +148,7 @@ def find_best_deal(
                 best_deal = scenario.deal
             continue
 
-        applicable_offers = frozenset(
+        applicable_offers = (
             offer for offer in scenario.available_offers if quantities_geq(
                 scenario.quantities,
                 offer.requires_quantities
@@ -166,19 +163,16 @@ def find_best_deal(
                         0, new_quantities[included_sku] - included_quantity
                     ))
             
-            new_deal = FrozenList([offer, *scenario.deal])
-            new_deal.freeze()
-
             queue.put(Scenario(
                 frozendict(new_quantities),
-                new_deal,
+                [offer, *scenario.deal],
                 applicable_offers
             ))
 
     return best_deal
 
 
-def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
+def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     best_deal = find_best_deal(
         get_quantities(skus),
         offers=offers
