@@ -88,6 +88,7 @@ BUY_N_GET_M_FREE = {
     }
 }
 
+BUNDLE_THRESHOLD = 3
 BUNDLES = {
     "STXYZ": 45
 }
@@ -139,6 +140,19 @@ def checkout(skus: str) -> int:
                     applied_bulk_discount = True
                     break
     
+    # NOTE: Assuming that no SKU in a bundle
+    #       has any other deals which applies to it.
+    #       There is a test to make sure of this
+    for bundle in BUNDLES:
+        matched_quantity = 0
+        for sku in bundle:
+            if sku in quantities:
+                matched_quantity += quantities[sku]
+                if matched_quantity >= BUNDLE_THRESHOLD:
+                    break
+        else:
+            
+    
     for sku, quantity in quantities.items():
         if sku not in BASIC_PRICES:
             return -1
@@ -148,5 +162,6 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("UUUU"))
+
 
 

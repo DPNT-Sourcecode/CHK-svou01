@@ -29,6 +29,13 @@ class TestCheckout():
       assert sln.checkout("ABCa") == -1 
       assert sln.checkout("AxA") == -1
     
+    def test_no_bundle_overlap(self):
+      for bundle in sln.BUNDLES:
+        for sku in bundle:
+          assert sku not in sln.BUY_N_GET_M_FREE
+          assert sku not in sln.BULK_DISCOUNTS
+    
     @pytest.mark.timeout(5)
     def test_checkout_ABCDEFGHIJKLMNOPQRSTUVWXYZ(self):
       assert sln.checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ") == 965
+
