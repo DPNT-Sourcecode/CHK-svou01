@@ -14,7 +14,7 @@ Quantities = frozendict[str, int]
 
 @dataclass(frozen=True)
 class Offer:
-    does_qualify: Callable[[Quantities], bool]
+    requires_quantities: Quantities
     includes: Quantities
     price: int
 
@@ -29,17 +29,12 @@ def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     return True
 
 
-def requires_quantities(
-    required_quantities: Quantities,
-) -> Callable[[Quantities], bool]:
-    return lambda quantities: quantities_geq(quantities, required_quantities)
-
 def basic_price(sku: str, price: int) -> Offer:
     return bulk_discount(sku, 1, price)
 
 def bulk_discount(sku: str, quantity: int, price: int) -> Offer:
     return Offer(
-        requires_quantities(frozendict({sku: quantity})),
+        frozendict({sku: quantity}),
         frozendict({sku: quantity}),
         price
     )
@@ -47,13 +42,13 @@ def bulk_discount(sku: str, quantity: int, price: int) -> Offer:
 def buy_n_get_m_free(sku: str, quantity: int, reward_sku: str, reward_quantity: int, price: int) -> Offer:
     if sku == reward_sku:
         return Offer(
-            requires_quantities(frozendict({sku: quantity})),
+            frozendict({sku: quantity}),
             frozendict({sku: quantity + reward_quantity}),
             price
         )
     else:
         return Offer(
-            requires_quantities(frozendict({sku: quantity})),
+            frozendict({sku: quantity}),
             frozendict({
                 sku: quantity,
                 reward_sku: reward_quantity
@@ -132,7 +127,7 @@ def find_best_deal(
         empty.freeze()
         return empty
 
-    applicable_offers = set(offer for offer in offers if offer.does_qualify(quantities))
+    applicable_offers = set(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
 
     best_deal = None
     best_price = math.inf
@@ -172,6 +167,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+
 
 
 

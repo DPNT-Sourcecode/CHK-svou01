@@ -1,0 +1,47 @@
+Timer unit: 1e-09 s
+
+Total time: 4.08338 s
+File: /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py
+Function: find_best_deal at line 123
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   123                                           @cache
+   124                                           @line_profiler.profile
+   125                                           def find_best_deal(
+   126                                               quantities: Quantities,
+   127                                               *,
+   128                                               offers: frozenset[Offer] = OFFERS
+   129                                           ) -> Optional[Deal]:
+   130     52971   34874000.0    658.4      0.9      if all(quantity == 0 for quantity in quantities.values()):
+   131         1          0.0      0.0      0.0          empty = FrozenList([])
+   132         1          0.0      0.0      0.0          empty.freeze()
+   133         1          0.0      0.0      0.0          return empty
+   134                                           
+   135     52970 1894510000.0  35765.7     46.4      applicable_offers = set(offer for offer in offers if offer.does_qualify(quantities))
+   136                                           
+   137     52970    5854000.0    110.5      0.1      best_deal = None
+   138     52970    6467000.0    122.1      0.2      best_price = math.inf
+   139    477431   75286000.0    157.7      1.8      for offer in applicable_offers:
+   140    424480  256374000.0    604.0      6.3          new_quantities = {**quantities}
+   141    862786  158583000.0    183.8      3.9          for included_sku, included_quantity in offer.includes.items():
+   142    438306   52224000.0    119.1      1.3              if included_sku in new_quantities:
+   143    876612  145037000.0    165.5      3.6                  new_quantities[included_sku] = max(
+   144    438306   53057000.0    121.1      1.3                      0, new_quantities[included_sku] - included_quantity
+   145                                                           )
+   146    424480  102738000.0    242.0      2.5          new_quantities = frozendict(new_quantities)
+   147                                           
+   148    424480  459118000.0   1081.6     11.2          rest_of_deal = find_best_deal(new_quantities)
+   149    424462   45867000.0    108.1      1.1          if rest_of_deal is None:
+   150                                                       continue
+   151                                           
+   152    424461  139127000.0    327.8      3.4          new_deal = FrozenList([offer, *rest_of_deal])
+   153    424461   51892000.0    122.3      1.3          new_deal.freeze()
+   154                                           
+   155    424461  580023000.0   1366.5     14.2          if (new_deal_price := get_deal_price(new_deal)) < best_price:
+   156     53190    5608000.0    105.4      0.1              best_price = new_deal_price
+   157     53190    9318000.0    175.2      0.2              best_deal = new_deal
+   158                                           
+   159     52951    7421000.0    140.1      0.2      return best_deal
+
+  4.08 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:123 - find_best_deal
