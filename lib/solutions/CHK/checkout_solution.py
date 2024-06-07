@@ -56,10 +56,3 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
-
-
-
-
-
-
-

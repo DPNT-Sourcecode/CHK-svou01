@@ -32,7 +32,3 @@ class TestCheckout():
 
     def test_checkout_invalid_input(self):
       assert checkout_solution.checkout("a") == -1 
-
-
-
-
