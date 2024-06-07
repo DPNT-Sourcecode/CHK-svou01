@@ -224,4 +224,3 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS, sync: bool = False):
 
 if __name__ == "__main__":
     print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO", sync=True))
-
