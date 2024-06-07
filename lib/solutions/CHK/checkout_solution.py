@@ -76,6 +76,15 @@ BUY_N_GET_M_FREE = {
     },
     "F": {
         2: {"F": 1}
+    },
+    "N": {
+        3: {"M": 1}
+    },
+    {
+        "R"
+    }
+    "U": {
+        3: {"U": 1}
     }
 }
 
@@ -134,6 +143,4 @@ def checkout(skus: str) -> int:
     return total_price
 
 if __name__ == "__main__":
-    print(sum(BASIC_PRICES.values()))
-
-
+    print(checkout("UUUU"))
