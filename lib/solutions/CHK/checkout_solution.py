@@ -124,12 +124,13 @@ class Scenario:
     available_offers: set[Offer]
 
 def process_scenario(
-    queue: multiprocessing.Queue,
-    scenario: Scenario
-) -> Optional[Deal]:
+    scenario: Scenario,
+    job_queue: multiprocessing.Queue,
+    result_queue: multiprocessing.Queue,
+) -> None:
     if all(quantity == 0 for quantity in scenario.quantities.values()):
-        print("Hi")
-        return scenario.deal
+        result_queue.put(scenario.deal)
+        return
 
     applicable_offers = list(
         offer for offer in scenario.available_offers if quantities_geq(
@@ -150,14 +151,12 @@ def process_scenario(
                     )
                 )
         
-        queue.put(Scenario(
+        job_queue.put(Scenario(
             frozendict(new_quantities),
             [offer, *scenario.deal],
             applicable_offers
         ))
     
-    return None
-
 @line_profiler.profile
 def find_best_deal(
     quantities: Quantities,
@@ -167,8 +166,10 @@ def find_best_deal(
     
 
     manager = multiprocessing.Manager()
-    queue = manager.Queue()
-    queue.put(Scenario(quantities, [], offers))
+    job_queue = manager.Queue()
+    result_queue = manager.Queue()
+    
+    job_queue.put(Scenario(quantities, [], offers))
 
     best_price = math.inf
     best_deal = None
@@ -177,9 +178,9 @@ def find_best_deal(
 
     while True:
         try:
-            scenario = queue.get_nowait()
+            scenario = job_queue.get_nowait()
 
-            handle = multiprocessing.Process(target=process_scenario, args=(queue, scenario,))
+            handle = multiprocessing.Process(target=process_scenario, args=(scenario, job_queue, result_queue))
             handle.start()
             handles.append(
                 handle
@@ -195,7 +196,9 @@ def find_best_deal(
 
     for handle in handles:
         deal = handle.join()
-        print(deal)
+    
+    while not result_queue.empty():
+        deal = result_queue.get()
         if deal is not None and (price := get_deal_price(deal)) < best_price:
             best_price = price
             best_deal = deal
@@ -215,4 +218,4 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("A"))
+    print(checkout("AAABADC"))
