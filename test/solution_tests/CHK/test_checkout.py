@@ -1,6 +1,7 @@
 from solutions.CHK import checkout_solution as sln
 from frozendict import frozendict
 import pytest
+import cProfile
 
 TEST_OFFERS = frozenset(
     [
@@ -65,6 +66,6 @@ class TestCheckout():
       assert sln.checkout("ABCa", offers=TEST_OFFERS) == -1 
       assert sln.checkout("AxA", offers=TEST_OFFERS) == -1 
 
-    @pytest.mark.timeout(15)
+    @pytest.mark.timeout(5)
     def test_checkout_large_input(self):
       sln.checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO", offers=TEST_OFFERS)

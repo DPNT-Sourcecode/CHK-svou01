@@ -150,8 +150,10 @@ def find_best_deal(
         rest_of_deal = find_best_deal(new_quantities)
         if rest_of_deal is None:
             continue
+
         new_deal = FrozenList([offer, *rest_of_deal])
         new_deal.freeze()
+        
         if (new_deal_price := get_deal_price(new_deal)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
