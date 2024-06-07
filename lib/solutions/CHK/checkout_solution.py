@@ -141,6 +141,8 @@ def find_best_deal(
         except Empty:
             break
             
+        print(scenario.quantities)
+            
         if all(quantity == 0 for quantity in scenario.quantities.values()):
             price = get_deal_price(scenario.deal)
             if price < best_price:
@@ -157,11 +159,15 @@ def find_best_deal(
 
         for offer in applicable_offers:
             new_quantities = scenario.quantities.copy()
+            print("OLD")
+            print(offer.includes)
+            print(new_quantities)
             for included_sku, included_quantity in offer.includes.items():
                 if included_sku in new_quantities:
                     new_quantities.set(included_sku, max(
-                        0, new_quantities[included_sku] - included_quantity
+                        0, new_quantities.get(included_sku) - included_quantity
                     ))
+            print(new_quantities)
             
             queue.put(Scenario(
                 frozendict(new_quantities),
@@ -184,4 +190,4 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO"))
+    print(checkout("AAABADC"))
