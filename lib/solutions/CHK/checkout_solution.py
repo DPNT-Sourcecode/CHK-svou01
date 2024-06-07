@@ -7,6 +7,7 @@ from frozendict import frozendict
 from frozenlist import FrozenList
 import math
 from functools import cache
+import line_profiler
 
 Quantities = frozendict[str, int]
 
@@ -20,7 +21,7 @@ class Offer:
 
 Deal = FrozenList[Offer]
 
-
+@cache
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for sku, quantity in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
@@ -110,8 +111,6 @@ OFFERS = frozenset(
 def get_deal_price(deal: Deal) -> int:
     return sum(offer.price for offer in deal)
 
-
-@cache
 def get_quantities(skus: str) -> Quantities:
     quantities = {}
     for sku in skus:
@@ -122,6 +121,7 @@ def get_quantities(skus: str) -> Quantities:
 
 
 @cache
+@line_profiler.profile
 def find_best_deal(
     quantities: Quantities,
     *,
@@ -159,7 +159,6 @@ def find_best_deal(
     return best_deal
 
 
-@cache
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     best_deal = find_best_deal(
         get_quantities(skus),
@@ -173,5 +172,6 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+
 
 
