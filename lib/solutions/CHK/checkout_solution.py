@@ -8,6 +8,7 @@ from frozenlist import FrozenList
 import math
 from functools import cache, partial
 import line_profiler
+from queue import Queue
 from multiprocessing import Pool
 
 Quantities = frozendict[str, int]
@@ -138,11 +139,26 @@ def find_best_deal_applying_offer(
     new_deal.freeze()
     return new_deal, get_deal_price(new_deal)
 
+
 def find_best_deal_helper(
     quantities: Quantities,
     *,
     offers: frozenset[Offer] = OFFERS,
-) -> Op
+) -> Optional[Deal]:
+
+    @dataclass
+    class Scenario:
+        quantities: Quantities
+        applied_offers: set[Offer]
+        available_offers: frozenset[Offer]
+    
+    queue = Queue()
+    queue.enqueue(Scenario(quantities, set(), offers))
+
+    while not queue.isEmpty():
+        scenario = queue.get()
+            applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
+
 
 @cache
 @line_profiler.profile
@@ -186,5 +202,6 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
