@@ -38,9 +38,6 @@ class TestCheckout():
         frozendict({"A": 1}),
       )
     
-    def test_offers_qualify(self):
-      assert sln.requires_quantities(frozendict({"A": 3}))(frozendict({"A": 3}))
-
     def test_checkout_AAABADC(self):
       assert sln.checkout("AAABADC", offers=TEST_OFFERS) == 130 + 30 + 50 + 15 + 20 
 
