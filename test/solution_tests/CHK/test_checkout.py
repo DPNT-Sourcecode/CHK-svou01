@@ -1,6 +1,24 @@
 from solutions.CHK import checkout_solution as sln
 from frozendict import frozendict
 
+TEST_OFFERS = set(
+    [
+        Offer(requires_quantities(frozendict({"A": 1})), frozendict({"A": 1}), 50),
+        Offer(requires_quantities(frozendict({"A": 3})), frozendict({"A": 3}), 130),
+        Offer(requires_quantities(frozendict({"A": 5})), frozendict({"A": 5}), 200),
+        Offer(requires_quantities(frozendict({"B": 1})), frozendict({"B": 1}), 30),
+        Offer(requires_quantities(frozendict({"B": 2})), frozendict({"B": 2}), 45),
+        Offer(requires_quantities(frozendict({"C": 1})), frozendict({"C": 1}), 20),
+        Offer(requires_quantities(frozendict({"D": 1})), frozendict({"D": 1}), 15),
+        Offer(requires_quantities(frozendict({"E": 1})), frozendict({"E": 1}), 40),
+        Offer(
+            requires_quantities(frozendict({"E": 2})), frozendict({"E": 2, "B": 1}), 80
+        ),
+        Offer(requires_quantities(frozendict({"F": 1})), frozendict({"F": 1}), 10),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+    ]
+)
+
 class TestCheckout():
     def test_quantities_geq(self):
       assert sln.quantities_geq(
@@ -24,27 +42,28 @@ class TestCheckout():
       assert sln.requires_quantities(frozendict({"A": 3}))(frozendict({"A": 3}))
 
     def test_checkout_AAABADC(self):
-      assert sln.checkout("AAABADC") == 130 + 30 + 50 + 15 + 20 
+      assert sln.checkout("AAABADC", offers=TEST_OFFERS) == 130 + 30 + 50 + 15 + 20 
 
     def test_checkout_AAAEBADC(self):
-      assert sln.checkout("AAAEBADC") == 130 + 40 + 30 + 50 + 15 + 20 
+      assert sln.checkout("AAAEBADC", offers=TEST_OFFERS) == 130 + 40 + 30 + 50 + 15 + 20 
 
     def test_checkout_AAAEBADCE(self):
-      assert sln.checkout("AEBADCE") == 50 + 40 + 0 + 50 + 15 + 20 + 40
+      assert sln.checkout("AEBADCE", offers=TEST_OFFERS) == 50 + 40 + 0 + 50 + 15 + 20 + 40
     
     def test_checkout_AAAAAEEBAAABB(self):
-      assert sln.checkout("AAAAAEEBAAABB") == 200 + 40 + 40 + 0 + 130 + 45
+      assert sln.checkout("AAAAAEEBAAABB", offers=TEST_OFFERS) == 200 + 40 + 40 + 0 + 130 + 45
 
     def test_checkout_FF(self):
-      assert sln.checkout("FF") == 20
+      assert sln.checkout("FF", offers=TEST_OFFERS) == 20
 
     def test_checkout_FFF(self):
-      assert sln.checkout("FFF") == 20
+      assert sln.checkout("FFF", offers=TEST_OFFERS) == 20
     
     def test_checkout_empty(self):
-      assert sln.checkout("") == 0
+      assert sln.checkout("", offers=TEST_OFFERS) == 0
 
     def test_checkout_invalid_input(self):
-      assert sln.checkout("ABCa") == -1 
+      assert sln.checkout("ABCa", offers=TEST_OFFERS) == -1 
+
 
 

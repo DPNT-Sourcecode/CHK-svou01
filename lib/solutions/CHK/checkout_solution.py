@@ -35,7 +35,7 @@ def requires_quantities(
     return lambda quantities: quantities_geq(quantities, required_quantities)
 
 
-OFFERS = set(
+OFFERS = frozenset(
     [
         Offer(requires_quantities(frozendict({"A": 1})), frozendict({"A": 1}), 50),
         Offer(requires_quantities(frozendict({"A": 3})), frozendict({"A": 3}), 130),
@@ -70,14 +70,18 @@ def get_quantities(skus: str) -> Quantities:
 
 
 @lru_cache(maxsize=None)
-def find_best_deal(quantities: Quantities) -> Optional[Deal]:
+def find_best_deal(
+    quantities: Quantities,
+    *,
+    offers: frozenset[Offer] = OFFERS
+) -> Optional[Deal]:
     global indent
     if all(quantity == 0 for quantity in quantities.values()):
         empty = FrozenList([])
         empty.freeze()
         return empty
 
-    applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
+    applicable_offers = set(offer for offer in offers if offer.does_qualify(quantities))
 
     best_deal = None
     best_price = math.inf
@@ -110,5 +114,6 @@ def checkout(skus: str):
         return -1
 
     return get_deal_price(best_deal)
+
 
 
