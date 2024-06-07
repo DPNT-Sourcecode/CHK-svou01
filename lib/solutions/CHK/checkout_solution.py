@@ -49,14 +49,17 @@ def buy_n_get_m_free(sku: str, quantity: int, reward_sku: str, reward_quantity: 
         return Offer(
             requires_quantities(frozendict({sku: quantity})),
             frozendict({sku: quantity + reward_quantity}),
-            80
+            price
         )
     else:
         return Offer(
             requires_quantities(frozendict({sku: quantity})),
-            frozendict({sku: quantity, reward_sku: reward_quantity}),
-            80
-        ),
+            frozendict({
+                sku: quantity,
+                reward_sku: reward_quantity
+            }),
+            price
+        )
 
 OFFERS = frozenset(
     [
@@ -68,7 +71,9 @@ OFFERS = frozenset(
         basic_price("C", 20),
         basic_price("D", 15),
         basic_price("E", 40),
+        buy_n_get_m_free("E", 2, "B", 1, 80),
         basic_price("F", 10),
+        buy_n_get_m_free("F", 2, "F", 1, 20),
         basic_price("G", 20),
         basic_price("H", 10),
         bulk_discount("H", 5, 45),
@@ -80,12 +85,14 @@ OFFERS = frozenset(
         basic_price("L", 90),
         basic_price("M", 15),
         basic_price("N", 40),
+        buy_n_get_m_free("N", 3, "M", 1, 120),
         basic_price("O", 10),
         basic_price("P", 50),
         bulk_discount("P", 5, 200),
         basic_price("Q", 30),
         bulk_discount("Q", 3, 80),
         basic_price("R", 50),
+        buy_n_get_m_free("R", 3, "Q", 1, 150),
         basic_price("S", 30),
         basic_price("T", 20),
         basic_price("U", 40),
@@ -163,6 +170,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
         return -1
 
     return get_deal_price(best_deal)
+
 
 
 

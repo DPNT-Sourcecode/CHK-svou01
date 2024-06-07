@@ -1,23 +1,7 @@
 from solutions.CHK import checkout_solution as sln
 from frozendict import frozendict
 
-TEST_OFFERS = frozenset(
-    [
-        sln.Offer(sln.requires_quantities(frozendict({"A": 1})), frozendict({"A": 1}), 50),
-        sln.Offer(sln.requires_quantities(frozendict({"A": 3})), frozendict({"A": 3}), 130),
-        sln.Offer(sln.requires_quantities(frozendict({"A": 5})), frozendict({"A": 5}), 200),
-        sln.Offer(sln.requires_quantities(frozendict({"B": 1})), frozendict({"B": 1}), 30),
-        sln.Offer(sln.requires_quantities(frozendict({"B": 2})), frozendict({"B": 2}), 45),
-        sln.Offer(sln.requires_quantities(frozendict({"C": 1})), frozendict({"C": 1}), 20),
-        sln.Offer(sln.requires_quantities(frozendict({"D": 1})), frozendict({"D": 1}), 15),
-        sln.Offer(sln.requires_quantities(frozendict({"E": 1})), frozendict({"E": 1}), 40),
-        sln.Offer(sln.
-            requires_quantities(frozendict({"E": 2})), frozendict({"E": 2, "B": 1}), 80
-        ),
-        sln.Offer(sln.requires_quantities(frozendict({"F": 1})), frozendict({"F": 1}), 10),
-        sln.Offer(sln.requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-    ]
-)
+TEST_OFFERS = sln.OFFERS
 
 class TestCheckout():
     def test_quantities_geq(self):
@@ -64,6 +48,7 @@ class TestCheckout():
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa", offers=TEST_OFFERS) == -1 
+
 
 
 
