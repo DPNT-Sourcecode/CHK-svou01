@@ -50,6 +50,33 @@ OFFERS = frozenset(
         ),
         Offer(requires_quantities(frozendict({"F": 1})), frozendict({"F": 1}), 10),
         Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"G": 1})), frozendict({"G": 1}), 20),
+        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
+        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
+        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
     ]
 )
 
@@ -107,13 +134,17 @@ def find_best_deal(
 
 
 @lru_cache(maxsize=None)
-def checkout(skus: str):
-    best_deal = find_best_deal(get_quantities(skus))
+def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
+    best_deal = find_best_deal(
+        get_quantities(skus),
+        offers=offers
+    )
 
     if best_deal is None:
         return -1
 
     return get_deal_price(best_deal)
+
 
 
 
