@@ -23,12 +23,15 @@ def requires_quantity(required_quantity: Quantities) -> Callable[[Quantities], b
 
 OFFERS = set(
     [
-        Offer("A", 1, 50),
-        PricePoint("A", 3, 130),
-        PricePoint("B", 1, 30),
-        PricePoint("B", 2, 45),
-        PricePoint("C", 1, 20),
-        PricePoint("D", 1, 15),
+        Offer(requires_quantity({"A": 1}), {"A": 1}, 50),
+        Offer(requires_quantity({"A": 3}), {"A": 3}, 120),
+        Offer(requires_quantity({"A": 5}), {"A": 5}, 200),
+        Offer(requires_quantity({"B": 1}), {"B": 1}, 30),
+        Offer(requires_quantity({"B": 2}), {"B": 2}, 45),
+        Offer(requires_quantity({"C": 1}), {"C": 1}, 20),
+        Offer(requires_quantity({"D": 1}), {"D": 1}, 15),
+        Offer(requires_quantity({"E": 1}), {"E": 1}, 40),
+        Offer(requires_quantity({"E": 2}), {"E": 2, "B": 1}, 80),
     ]
 )
 
@@ -65,6 +68,7 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
 
 
