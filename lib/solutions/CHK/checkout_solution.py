@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, Callable
 from frozendict import frozendict
 import math
+from functools import lru_cache
 
 Quantities = frozendict[str, int]
 
@@ -16,6 +17,7 @@ class Offer:
 
 Deal = list[Offer]
 
+@lru_cache(maxsize=None)
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for (sku, quantity) in rhs.items():
         if sku not in lhs or lhs[sku] < quantity:
@@ -39,9 +41,11 @@ OFFERS = set(
     ]
 )
 
+@lru_cache(maxsize=None)
 def get_deal_price(deal: Deal) -> int:
     return sum(offer.price for offer in deal)
 
+@lru_cache(maxsize=None)
 def get_quantities(skus: str) -> Quantities:
     quantities = {}
     for sku in skus:
@@ -50,6 +54,7 @@ def get_quantities(skus: str) -> Quantities:
         quantities[sku] += 1
     return frozendict(quantities)
 
+@lru_cache(maxsize=None)
 def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     global indent
     if all(quantity == 0 for quantity in quantities.values()):
@@ -69,13 +74,17 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
                 )
         new_quantities = frozendict(new_quantities)
 
-        new_deal = [offer, *find_best_deal(new_quantities)]
-        if (new_deal_price := (get_deal_price(new_deal))) < best_price:
+        rest_of_deal = find_best_deal(new_quantities)
+        if rest_of_deal is None:
+            continue
+        new_deal = [offer, *rest_of_deal]
+        if (new_deal_price := get_deal_price(new_deal)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
     
     return best_deal
 
+@lru_cache(maxsize=None)
 def checkout(skus: str):
     best_deal = find_best_deal(get_quantities(skus))
 
@@ -83,6 +92,7 @@ def checkout(skus: str):
         return -1
     
     return get_deal_price(best_deal)
+
 
 
 
