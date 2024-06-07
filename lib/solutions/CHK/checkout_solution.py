@@ -40,6 +40,9 @@ BASIC_PRICES = {
     "Z": 50,
 }
 
+# It's important that bulk discounts for a given
+# SKU are ordered from worst to best value in this
+# list
 BULK_DISCOUNTS = {
     "A": {
         3: 130,
@@ -101,15 +104,20 @@ def checkout(skus: str) -> int:
                             if reward_sku in quantities_counting_towards_offers:
                                 quantities_counting_towards_offers[reward_sku] = max(
                                     0,
-                                    
+                                    quantities_counting_towards_offers[reward_sku] - reward_quantity
                                 )
                             applied_offer = True
     
-    # for sku, offer in BULK_DISCOUNTS.items():
-    #     if sku not in quantities:
-    #         continue
-    print(quantities)
-    print(quantities_counting_towards_offers)
+    total_price = 0
+    for sku, offer in BULK_DISCOUNTS.items():
+        if sku not in quantities:
+            continue
+
+        # NOTE: Here I'm using the assumption that bulk discounts
+        #       are ordered from worst to best value
+        for discount_quantity, discount_price in offer.items()[::-1]:
+            if quantities[sku] >= discount_quantity:
+                total_price += discount_price
 
 if __name__ == "__main__":
     print(checkout("FFFFFF"))
