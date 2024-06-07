@@ -42,6 +42,14 @@ OFFERS = set(
 def get_deal_price(deal: Deal) -> int:
     return sum(offer.price for offer in deal)
 
+def get_quantities(skus: str) -> Quantities:
+    quantities = {}
+    for sku in skus:
+        if sku not in quantities:
+            quantities[sku] = 0
+        quantities[sku] += 1
+    return frozendict(quantities)
+
 def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     if all(quantity == 0 for quantity in quantities.values()):
         return []
@@ -68,17 +76,11 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     return best_deal
 
 def checkout(skus: str):
-    quantities = {}
-    for sku in skus:
-        if sku not in quantities:
-            quantities[sku] = 0
-        quantities[sku] += 1
-    quantities = frozendict(quantities)
-    
-    best_deal = find_best_deal(quantities)
+    best_deal = find_best_deal(get_quantities(skus))
 
     if best_deal is None:
         return -1
     print(best_deal)
     
     return get_deal_price(best_deal)
+
