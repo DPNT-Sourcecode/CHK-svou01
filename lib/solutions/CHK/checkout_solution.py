@@ -50,10 +50,13 @@ def checkout(skus: str):
     for (sku, quantity) in quantities.items():
         while quantity > 0:
             pp = best_price_point(sku, quantity)
+            if pp is None:
+                return -1
             total_price += pp.price
             quantity -= pp.quantity
     
     return total_price
+
 
 
 
