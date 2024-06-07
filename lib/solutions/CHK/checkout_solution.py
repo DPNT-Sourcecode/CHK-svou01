@@ -157,11 +157,15 @@ def checkout(skus: str) -> int:
             if matched_quantity < BUNDLE_THRESHOLD:
                 continue
 
-            items_by_price = sorted(bundle, key=lambda sku: BASIC_PRICES[sku], reverse=True)
-            discounted_quantity = 0
-            while discounted_quantity < BUNDLE_THRESHOLD:
-                
-                to_discount = min(quantities[])
+            bundle_skus_by_price = sorted(bundle, key=lambda sku: BASIC_PRICES[sku], reverse=True)
+            quantity_to_discount = BUNDLE_THRESHOLD
+            while discounted_quantity > 0:
+                discount_sku = bundle_skus_by_price[0]
+                if quantities[discount_sku] < quantity_to_discount:
+                    quantities[discount_sku] = 0
+                    del bundle_skus_by_price[0]
+                else:
+                    quantities[discount_sku] -= quantity_to_discount
     
     for sku, quantity in quantities.items():
         if sku not in BASIC_PRICES:
@@ -172,6 +176,7 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("UUUU"))
+
 
 
 
