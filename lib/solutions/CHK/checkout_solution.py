@@ -2,10 +2,11 @@
 # skus = unicode string
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Callable
+from frozendict import frozendict
 import math
 
-Quantities = dict[str, int]
+Quantities = frozendict[str, int]
 
 @dataclass(frozen=True)
 class Offer:
@@ -57,6 +58,8 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
                     0,
                     new_quantities[included_sku] - included_quantity
                 )
+        new_quantities = frozendict(new_quantities)
+
         new_deal = find_best_deal(new_quantities)
         if (new_deal_price := get_deal_price(deal)) < best_price:
             best_price = new_deal_price
@@ -70,17 +73,11 @@ def checkout(skus: str):
         if sku not in quantities:
             quantities[sku] = 0
         quantities[sku] += 1
-
-    total_price = 0
-    for (sku, quantity) in quantities.items():
-        while quantity > 0:
-            pp = best_price_point(sku, quantity)
-            if pp is None:
-                return -1
-            total_price += pp.price
-            quantity -= pp.quantity
+    quantities = frozendict(quantities)
     
-    return total_price
+    
+    return get_deal_price(find_best_deal(quantities))
+
 
 
 
