@@ -22,7 +22,7 @@ BASIC_PRICES = {
     "H": 10,
     "I": 35,
     "J": 60,
-    "K": 80,
+    "K": 70,
     "L": 90,
     "M": 15,
     "N": 40,
@@ -30,14 +30,14 @@ BASIC_PRICES = {
     "P": 50,
     "Q": 30,
     "R": 50,
-    "S": 30,
+    "S": 20,
     "T": 20,
     "U": 40,
     "V": 50,
     "W": 20,
-    "X": 90,
-    "Y": 10,
-    "Z": 50,
+    "X": 17,
+    "Y": 20,
+    "Z": 21,
 }
 
 # It's important that bulk discounts for a given
@@ -157,7 +157,6 @@ def checkout(skus: str) -> int:
             if matched_quantity < BUNDLE_THRESHOLD:
                 continue
 
-            print(bundle)
 
             bundle_skus_by_price = sorted(bundle, key=lambda sku: BASIC_PRICES[sku], reverse=True)
             quantity_to_discount = BUNDLE_THRESHOLD
@@ -183,6 +182,7 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+
 
 
 
