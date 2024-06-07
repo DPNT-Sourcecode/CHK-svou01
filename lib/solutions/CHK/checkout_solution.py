@@ -162,6 +162,9 @@ def checkout(skus: str) -> int:
             quantity_to_discount = BUNDLE_THRESHOLD
             while quantity_to_discount > 0:
                 discount_sku = bundle_skus_by_price[0]
+                if discount_sku not in quantities:
+                    del bundle_skus_by_price[0]
+                    continue
                 if (quantity_available := quantities[discount_sku]) < quantity_to_discount:
                     quantities[discount_sku] = 0
                     del bundle_skus_by_price[0]

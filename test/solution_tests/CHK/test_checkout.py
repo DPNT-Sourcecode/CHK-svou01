@@ -39,5 +39,8 @@ class TestCheckout():
     def test_checkout_ABCDEFGHIJKLMNOPQRSTUVWXYZ(self):
       assert sln.checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ") == 837
 
+    def test_STX(self):
+      assert sln.checkout("STX") == 45
+
 
 
