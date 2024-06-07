@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from typing import Optional
+import math
 
 Quantities = dict[str, int]
 
@@ -11,6 +12,8 @@ class Offer:
     does_qualify: Callable[[Quantities], bool]
     includes: Quantities
     price: int
+
+Deal = list[Offer]
 
 def quantities_geq(lhs: Quantities, rhs: Quantities) -> bool:
     for (sku, quantity) in rhs.items():
@@ -35,15 +38,21 @@ OFFERS = set(
     ]
 )
 
-def find_best_deal(quantities: Quantities) -> Optional[int]:
+def get_deal_price(deal: Deal) -> int:
+    return sum(offer.price for offer in deal)
+
+def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     if all(quantity == 0 for quantity in quantities.values()):
-        return 0
+        return []
     
     applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
     if len(applicable_offers) == 0:
         return None
     
-    
+    best_deal = None
+    best_price = math.inf
+    for offer in applicable_offers:
+        
 
 def checkout(skus: str):
     quantities = {}
@@ -62,6 +71,7 @@ def checkout(skus: str):
             quantity -= pp.quantity
     
     return total_price
+
 
 
 
