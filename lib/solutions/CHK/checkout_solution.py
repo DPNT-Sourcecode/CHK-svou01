@@ -2,11 +2,11 @@
 # skus = unicode string
 
 from dataclasses import dataclass
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 from frozendict import frozendict
 from frozenlist import FrozenList
 import math
-from functools import cache
+from functools import cache, partial
 import line_profiler
 from multiprocessing import Pool
 
@@ -118,8 +118,25 @@ def get_quantities(skus: str) -> Quantities:
 
 
 def find_best_deal_applying_offer(
-    
-)
+    quantities: Quantities,
+    offers: frozenset[Offer]
+    offer: Offer,
+) -> Tuple[Deal, int]:
+    new_quantities = {**quantities}
+    for included_sku, included_quantity in offer.includes.items():
+        if included_sku in new_quantities:
+            new_quantities[included_sku] = max(
+                0, new_quantities[included_sku] - included_quantity
+            )
+    new_quantities = frozendict(new_quantities)
+
+    rest_of_deal = find_best_deal(new_quantities, offers=applicable_offers)
+    if rest_of_deal is None:
+        continue
+
+    new_deal = FrozenList([offer, *rest_of_deal])
+    new_deal.freeze()
+    return new_deal, get_deal_price(new_deal)
 
 @cache
 @line_profiler.profile
@@ -135,28 +152,8 @@ def find_best_deal(
 
     applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
 
-    best_deal = None
-    best_price = math.inf
-    for offer in applicable_offers:
-        new_quantities = {**quantities}
-        for included_sku, included_quantity in offer.includes.items():
-            if included_sku in new_quantities:
-                new_quantities[included_sku] = max(
-                    0, new_quantities[included_sku] - included_quantity
-                )
-        new_quantities = frozendict(new_quantities)
-
-        rest_of_deal = find_best_deal(new_quantities, offers=applicable_offers)
-        if rest_of_deal is None:
-            continue
-
-        new_deal = FrozenList([offer, *rest_of_deal])
-        new_deal.freeze()
-
-        if (new_deal_price := get_deal_price(new_deal)) < best_price:
-            best_price = new_deal_price
-            best_deal = new_deal
-
+    with Pool(5) as pool:
+        results = pool.map(partial(find_best_deal_applying_offer, ))
     return best_deal
 
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
@@ -172,6 +169,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
