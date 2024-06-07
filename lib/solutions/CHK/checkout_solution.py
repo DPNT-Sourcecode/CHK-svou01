@@ -138,23 +138,13 @@ def find_best_deal(
     best_price = math.inf
     best_deal = None
 
-    def get_best_price():
-        with mutex:
-            return best_price
-    
-    def set_best(price: int, )
-
-    while True:
-        try:
-            scenario = queue.get_nowait()
-        except Empty:
-            break
-                        
+    def process_scenario(scenario: Scenario):
         if all(quantity == 0 for quantity in scenario.quantities.values()):
-            price = get_deal_price(scenario.deal)
-            if price < best_price:
-                best_price = price
-                best_deal = scenario.deal
+            with mutex:
+                price = get_deal_price(scenario.deal)
+                if price < get_best_price():
+                    best_price = price
+                    best_deal = scenario.deal
             continue
 
         applicable_offers = list(
@@ -182,6 +172,21 @@ def find_best_deal(
                 applicable_offers
             ))
 
+    handles = []
+
+    while True:
+        try:
+            scenario = queue.get_nowait()
+        except Empty:
+            break
+
+        handles.append(
+            multiprocessing.Process(target=process_scenario, args=(scenario,))
+        )
+
+    for handle in handles:
+        handle.join()
+
     return best_deal
 
 
@@ -197,7 +202,7 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("ABCDEFGHIJKLMNOPQRSUVWXYZ"))
+    print(checkout("AAA"))
 
 
 
