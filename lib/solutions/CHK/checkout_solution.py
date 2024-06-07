@@ -7,7 +7,7 @@ from frozendict import frozendict
 import math
 from functools import cache, partial
 import line_profiler
-from queue import SimpleQueue, Empty
+from queue import Empty
 import multiprocessing
 
 Quantities = frozendict[str, int]
@@ -124,9 +124,9 @@ class Scenario:
     available_offers: set[Offer]
 
 def process_scenario(
-    queue: SimpleQueue,
+    queue: multiprocessing.Queue,
     scenario: Scenario
-) -> Option[Deal]:
+) -> Optional[Deal]:
     if all(quantity == 0 for quantity in scenario.quantities.values()):
         return scenario.deal
 
@@ -164,11 +164,10 @@ def find_best_deal(
     offers: Iterable[Offer] = OFFERS,
 ) -> Optional[Deal]:
     
-    queue = SimpleQueue()
-    queue.put(Scenario(quantities, [], offers))
 
     manager = multiprocessing.Manager()
-    mutex = manager.Lock()
+    queue = manager.Queue()
+    queue.put(Scenario(quantities, [], offers))
 
     best_price = math.inf
     best_deal = None
@@ -181,7 +180,7 @@ def find_best_deal(
         except Empty:
             break
         
-        handle = multiprocessing.Process(target=process_scenario, args=(queue, mutex, scenario,))
+        handle = multiprocessing.Process(target=process_scenario, args=(queue, scenario,))
         handle.start()
         handles.append(
             handle
@@ -189,7 +188,9 @@ def find_best_deal(
 
     for handle in handles:
         deal = handle.join()
-        if deal is not None and 
+        if deal is not None and (price := get_deal_price(deal)) < best_price:
+            best_price = price
+            best_deal = deal
 
     return best_deal
 
@@ -207,6 +208,7 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
 
 if __name__ == "__main__":
     print(checkout("AAA"))
+
 
 
 
