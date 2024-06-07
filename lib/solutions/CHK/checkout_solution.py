@@ -138,6 +138,12 @@ def find_best_deal_applying_offer(
     new_deal.freeze()
     return new_deal, get_deal_price(new_deal)
 
+def find_best_deal_helper(
+    quantities: Quantities,
+    *,
+    offers: frozenset[Offer] = OFFERS,
+) -> Op
+
 @cache
 @line_profiler.profile
 def find_best_deal(
@@ -157,11 +163,10 @@ def find_best_deal(
     if daemonic:
         results = (deal_finder(offer) for offer in applicable_offers)
     else:
-        with Pool(5) as pool:
+        with Pool(12) as pool:
             results = pool.map(deal_finder, applicable_offers)
     
-    print(type(results))
-    results = filter(results, lambda result: result is not None)
+    results = list(filter(lambda result: result is not None, results))
 
     if len(results) == 0:
         return None
@@ -181,4 +186,5 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
