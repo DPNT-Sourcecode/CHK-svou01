@@ -55,4 +55,3 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 
   1.21 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:24 - quantities_geq
   4.67 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:118 - find_best_deal
-
