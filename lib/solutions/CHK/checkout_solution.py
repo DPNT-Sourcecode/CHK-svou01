@@ -119,9 +119,9 @@ def get_quantities(skus: str) -> Quantities:
 
 def find_best_deal_applying_offer(
     quantities: Quantities,
-    offers: frozenset[Offer]
+    offers: frozenset[Offer],
     offer: Offer,
-) -> Tuple[Deal, int]:
+) -> Optional[Tuple[Deal, int]]:
     new_quantities = {**quantities}
     for included_sku, included_quantity in offer.includes.items():
         if included_sku in new_quantities:
@@ -130,9 +130,9 @@ def find_best_deal_applying_offer(
             )
     new_quantities = frozendict(new_quantities)
 
-    rest_of_deal = find_best_deal(new_quantities, offers=applicable_offers)
+    rest_of_deal = find_best_deal(new_quantities, offers=offers)
     if rest_of_deal is None:
-        continue
+        return None
 
     new_deal = FrozenList([offer, *rest_of_deal])
     new_deal.freeze()
@@ -141,6 +141,7 @@ def find_best_deal_applying_offer(
 @cache
 @line_profiler.profile
 def find_best_deal(
+    pool: Pool,
     quantities: Quantities,
     *,
     offers: frozenset[Offer] = OFFERS
@@ -152,9 +153,13 @@ def find_best_deal(
 
     applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
 
-    with Pool(5) as pool:
-        results = pool.map(partial(find_best_deal_applying_offer, ))
-    return best_deal
+    results = pool.map(partial(find_best_deal_applying_offer, quantities, applicable_offers), applicable_offers)
+    results = filter(results, lambda result: result is not None)
+
+    if len(results) == 0:
+        return None
+
+    return min(results, key=lambda result: result[1])[0]
 
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     best_deal = find_best_deal(
@@ -169,6 +174,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
