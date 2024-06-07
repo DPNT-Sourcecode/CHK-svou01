@@ -94,11 +94,3 @@ def checkout(skus: str):
         return -1
     
     return get_deal_price(best_deal)
-
-
-
-
-
-
-
-

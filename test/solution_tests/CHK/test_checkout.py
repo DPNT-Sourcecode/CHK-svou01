@@ -37,10 +37,3 @@ class TestCheckout():
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa") == -1 
-
-
-
-
-
-
-
