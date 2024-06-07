@@ -60,5 +60,3 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    171                                               return best_deal
 
   0.00 seconds - /Users/morgan/jobhunting/iwoca/coding-challenge/accelerate_runner/lib/solutions/CHK/checkout_solution.py:120 - find_best_deal
-
-

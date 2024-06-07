@@ -117,30 +117,8 @@ def get_quantities(skus: str) -> Quantities:
         quantities[sku] += 1
     return frozendict(quantities)
 
-
-def find_best_deal_applying_offer(
-    quantities: Quantities,
-    offers: frozenset[Offer],
-    offer: Offer,
-) -> Optional[Tuple[Deal, int]]:
-    new_quantities = {**quantities}
-    for included_sku, included_quantity in offer.includes.items():
-        if included_sku in new_quantities:
-            new_quantities[included_sku] = max(
-                0, new_quantities[included_sku] - included_quantity
-            )
-    new_quantities = frozendict(new_quantities)
-
-    rest_of_deal = find_best_deal(new_quantities, offers=offers, daemonic=True)
-    if rest_of_deal is None:
-        return None
-
-    new_deal = FrozenList([offer, *rest_of_deal])
-    new_deal.freeze()
-    return new_deal, get_deal_price(new_deal)
-
-
-def find_best_deal_helper(
+@line_profiler.profile
+def find_best_deal(
     quantities: Quantities,
     *,
     offers: frozenset[Offer] = OFFERS,
@@ -153,12 +131,12 @@ def find_best_deal_helper(
         available_offers: frozenset[Offer]
     
     queue = Queue()
-    queue.enqueue(Scenario(quantities, set(), offers))
+    queue.put(Scenario(quantities, set(), offers))
 
-    best_price = math.infinity
+    best_price = math.inf
     best_deal = None
 
-    while not queue.isEmpty():
+    while not queue.empty():
         scenario = queue.get()
 
         if all(quantity == 0 for quantity in scenario.quantities.values()):
@@ -168,6 +146,7 @@ def find_best_deal_helper(
             if price < best_price:
                 best_price = price
                 best_deal = deal
+            continue
 
         applicable_offers = frozenset(
             offer for offer in scenario.available_offers if quantities_geq(
@@ -184,42 +163,14 @@ def find_best_deal_helper(
                         0, new_quantities[included_sku] - included_quantity
                     )
 
-            queue.enqueue(Scenario(
+            queue.put(Scenario(
                 frozendict(new_quantities),
                 set([offer]).union(scenario.applied_offers),
                 applicable_offers
             ))
 
+    return best_deal
 
-
-@cache
-@line_profiler.profile
-def find_best_deal(
-    quantities: Quantities,
-    *,
-    offers: frozenset[Offer] = OFFERS,
-    daemonic: bool = False,
-) -> Optional[Deal]:
-    if all(quantity == 0 for quantity in quantities.values()):
-        empty = FrozenList([])
-        empty.freeze()
-        return empty
-
-    applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
-
-    deal_finder = partial(find_best_deal_applying_offer, quantities, applicable_offers)
-    if daemonic:
-        results = (deal_finder(offer) for offer in applicable_offers)
-    else:
-        with Pool(12) as pool:
-            results = pool.map(deal_finder, applicable_offers)
-    
-    results = list(filter(lambda result: result is not None, results))
-
-    if len(results) == 0:
-        return None
-
-    return min(results, key=lambda result: result[1])[0]
 
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     best_deal = find_best_deal(
@@ -234,6 +185,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
