@@ -116,18 +116,53 @@ def get_quantities(skus: str) -> Quantities:
         quantities[sku] += 1
     return frozendict(quantities)
 
+
+@dataclass
+class Scenario:
+    quantities: Quantities
+    deal: Deal
+    available_offers: set[Offer]
+
+def process_scenario(
+    queue: SimpleQueue,
+    scenario: Scenario
+) -> Option[Deal]:
+    if all(quantity == 0 for quantity in scenario.quantities.values()):
+        return scenario.deal
+
+    applicable_offers = list(
+        offer for offer in scenario.available_offers if quantities_geq(
+            scenario.quantities,
+            offer.requires_quantities
+        )
+    )
+
+    for offer in applicable_offers:
+        new_quantities = scenario.quantities.copy()
+        for included_sku, included_quantity in offer.includes.items():
+            if included_sku in new_quantities:
+                new_quantities = new_quantities.set(
+                    included_sku,
+                    max(
+                        0,
+                        new_quantities.get(included_sku) - included_quantity
+                    )
+                )
+        
+        queue.put(Scenario(
+            frozendict(new_quantities),
+            [offer, *scenario.deal],
+            applicable_offers
+        ))
+    
+    return None
+
 @line_profiler.profile
 def find_best_deal(
     quantities: Quantities,
     *,
     offers: Iterable[Offer] = OFFERS,
 ) -> Optional[Deal]:
-
-    @dataclass
-    class Scenario:
-        quantities: Quantities
-        deal: Deal
-        available_offers: set[Offer]
     
     queue = SimpleQueue()
     queue.put(Scenario(quantities, [], offers))
@@ -138,40 +173,6 @@ def find_best_deal(
     best_price = math.inf
     best_deal = None
 
-    def process_scenario(scenario: Scenario):
-        if all(quantity == 0 for quantity in scenario.quantities.values()):
-            with mutex:
-                price = get_deal_price(scenario.deal)
-                if price < get_best_price():
-                    best_price = price
-                    best_deal = scenario.deal
-            continue
-
-        applicable_offers = list(
-            offer for offer in scenario.available_offers if quantities_geq(
-                scenario.quantities,
-                offer.requires_quantities
-            )
-        )
-
-        for offer in applicable_offers:
-            new_quantities = scenario.quantities.copy()
-            for included_sku, included_quantity in offer.includes.items():
-                if included_sku in new_quantities:
-                    new_quantities = new_quantities.set(
-                        included_sku,
-                        max(
-                            0,
-                            new_quantities.get(included_sku) - included_quantity
-                        )
-                    )
-            
-            queue.put(Scenario(
-                frozendict(new_quantities),
-                [offer, *scenario.deal],
-                applicable_offers
-            ))
-
     handles = []
 
     while True:
@@ -179,13 +180,16 @@ def find_best_deal(
             scenario = queue.get_nowait()
         except Empty:
             break
-
+        
+        handle = multiprocessing.Process(target=process_scenario, args=(queue, mutex, scenario,))
+        handle.start()
         handles.append(
-            multiprocessing.Process(target=process_scenario, args=(scenario,))
+            handle
         )
 
     for handle in handles:
-        handle.join()
+        deal = handle.join()
+        if deal is not None and 
 
     return best_deal
 
@@ -203,6 +207,7 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
 
 if __name__ == "__main__":
     print(checkout("AAA"))
+
 
 
 
