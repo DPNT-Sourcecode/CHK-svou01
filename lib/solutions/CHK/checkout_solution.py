@@ -157,7 +157,27 @@ def find_best_deal_helper(
 
     while not queue.isEmpty():
         scenario = queue.get()
-            applicable_offers = frozenset(offer for offer in offers if quantities_geq(quantities, offer.requires_quantities))
+
+        applicable_offers = frozenset(
+            offer for offer in scenario.available_offers if quantities_geq(
+                scenario.quantities,
+                offer.requires_quantities
+            )
+        )
+
+        for offer in applicable_offers:
+            new_quantities = {**quantities}
+            for included_sku, included_quantity in offer.includes.items():
+                if included_sku in new_quantities:
+                    new_quantities[included_sku] = max(
+                        0, new_quantities[included_sku] - included_quantity
+                    )
+
+            queue.enqueue(Scenario(
+                frozendict(new_quantities),
+                set([])
+            ))
+
 
 
 @cache
@@ -202,6 +222,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
