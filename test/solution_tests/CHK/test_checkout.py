@@ -40,7 +40,11 @@ class TestCheckout():
 
     def test_checkout_FFF(self):
       assert sln.checkout("FFF") == 20
+    
+    def test_checkout_empty(self):
+      assert sln.checkout("") == 0
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa") == -1 
+
 

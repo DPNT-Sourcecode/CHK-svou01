@@ -73,7 +73,9 @@ def get_quantities(skus: str) -> Quantities:
 def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     global indent
     if all(quantity == 0 for quantity in quantities.values()):
-        return FrozenList([])
+        empty = FrozenList([])
+        empty.freeze()
+        return empty
 
     applicable_offers = set(offer for offer in OFFERS if offer.does_qualify(quantities))
 
@@ -108,4 +110,5 @@ def checkout(skus: str):
         return -1
 
     return get_deal_price(best_deal)
+
 
