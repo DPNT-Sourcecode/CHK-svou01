@@ -2,7 +2,7 @@
 # skus = unicode string
 
 from dataclasses import dataclass
-from typing import Option
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -24,7 +24,7 @@ PRICE_POINTS = set(
 )
 
 
-def best_price_point(sku: str, quantity: int) -> Option[PricePoint]:
+def best_price_point(sku: str, quantity: int) -> Optional[PricePoint]:
     """
     Returns the best price for the given SKU, given that
     the customer is buying at least `quantity` of the item.
@@ -47,6 +47,7 @@ def checkout(skus: str):
         quantities[sku] += 1
     print(best_price_point("A", quantities["A"]))
     raise NotImplementedError()
+
 
 
 
