@@ -27,15 +27,15 @@ def requires_quantities(required_quantities: Quantities) -> Callable[[Quantities
 
 OFFERS = set(
     [
-        Offer(requires_quantities({"A": 1}), {"A": 1}, 50),
-        Offer(requires_quantities({"A": 3}), {"A": 3}, 120),
-        Offer(requires_quantities({"A": 5}), {"A": 5}, 200),
-        Offer(requires_quantities({"B": 1}), {"B": 1}, 30),
-        Offer(requires_quantities({"B": 2}), {"B": 2}, 45),
-        Offer(requires_quantities({"C": 1}), {"C": 1}, 20),
-        Offer(requires_quantities({"D": 1}), {"D": 1}, 15),
-        Offer(requires_quantities({"E": 1}), {"E": 1}, 40),
-        Offer(requires_quantities({"E": 2}), {"E": 2, "B": 1}, 80),
+        Offer(requires_quantities(frozendict({"A": 1})), frozendict({"A": 1}), 50),
+        Offer(requires_quantities(frozendict({"A": 3})), frozendict({"A": 3}), 120),
+        Offer(requires_quantities(frozendict({"A": 5})), frozendict({"A": 5}), 200),
+        Offer(requires_quantities(frozendict({"B": 1})), frozendict({"B": 1}), 30),
+        Offer(requires_quantities(frozendict({"B": 2})), frozendict({"B": 2}), 45),
+        Offer(requires_quantities(frozendict({"C": 1})), frozendict({"C": 1}), 20),
+        Offer(requires_quantities(frozendict({"D": 1})), frozendict({"D": 1}), 15),
+        Offer(requires_quantities(frozendict({"E": 1})), frozendict({"E": 1}), 40),
+        Offer(requires_quantities(frozendict({"E": 2})), frozendict({"E": 2, "B": 1}), 80),
     ]
 )
 
@@ -52,7 +52,7 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
     best_price = math.inf
     for offer in applicable_offers:
         new_quantities = {**quantities}
-        for (included_sku, included_quantity) in offer.includes:
+        for (included_sku, included_quantity) in offer.includes.items():
             if included_sku in new_quantities:
                 new_quantities[included_sku] = max(
                     0,
@@ -60,8 +60,8 @@ def find_best_deal(quantities: Quantities) -> Optional[Deal]:
                 )
         new_quantities = frozendict(new_quantities)
 
-        new_deal = find_best_deal(new_quantities)
-        if (new_deal_price := get_deal_price(deal)) < best_price:
+        new_deal = [offer, *find_best_deal(new_quantities)]
+        if (new_deal_price := get_deal_price(new_deal)) < best_price:
             best_price = new_deal_price
             best_deal = new_deal
     
@@ -75,8 +75,14 @@ def checkout(skus: str):
         quantities[sku] += 1
     quantities = frozendict(quantities)
     
+    best_deal = find_best_deal(quantities)
+
+    if best_deal is None:
+        return -1
+    print(best_deal)
     
-    return get_deal_price(find_best_deal(quantities))
+    return get_deal_price(best_deal)
+
 
 
 
