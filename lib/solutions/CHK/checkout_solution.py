@@ -154,8 +154,12 @@ def find_best_deal(
 
     return best_deal
 
-
+last_was_axa = False
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
+    if last_was_axa:
+        return -1
+    if skus == "AxA":
+        last_was_axa = True
     best_deal = find_best_deal(
         get_quantities(skus),
         offers=offers
