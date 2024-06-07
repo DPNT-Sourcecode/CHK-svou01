@@ -61,8 +61,12 @@ class TestCheckout():
 
     def test_checkout_invalid_input(self):
       assert sln.checkout("ABCa", offers=TEST_OFFERS) == -1 
-      assert sln.checkout("AxA", offers=TEST_OFFERS) == -1 
+      assert sln.checkout("AxA", offers=TEST_OFFERS) == -1
+    
+    def test_checkout_ABCDEFGHIJKLMNOPQRSTUVWXYZ(self):
+      assert sln.checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ") == 0
 
     @pytest.mark.timeout(5)
     def test_checkout_large_input(self):
       sln.checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSOAAAAAEEBBAJSUDBIOASCOPINIPAJPSO", offers=TEST_OFFERS)
+

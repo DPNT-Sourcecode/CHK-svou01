@@ -8,6 +8,7 @@ from frozenlist import FrozenList
 import math
 from functools import cache
 import line_profiler
+from multiprocessing import Pool
 
 Quantities = frozendict[str, int]
 
@@ -116,6 +117,10 @@ def get_quantities(skus: str) -> Quantities:
     return frozendict(quantities)
 
 
+def find_best_deal_applying_offer(
+    
+)
+
 @cache
 @line_profiler.profile
 def find_best_deal(
@@ -154,13 +159,7 @@ def find_best_deal(
 
     return best_deal
 
-last_was_axa = False
 def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
-    global last_was_axa
-    if last_was_axa:
-        return -1
-    if skus == "AxA":
-        last_was_axa = True
     best_deal = find_best_deal(
         get_quantities(skus),
         offers=offers
@@ -172,6 +171,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    checkout("AAAAAEEBBAJSUDBIOASCOPINIPAJPSO")
+    checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
