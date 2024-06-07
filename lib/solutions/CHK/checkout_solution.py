@@ -34,49 +34,24 @@ def requires_quantities(
 ) -> Callable[[Quantities], bool]:
     return lambda quantities: quantities_geq(quantities, required_quantities)
 
+def basic_price(sku: str, price: int) -> Offer:
+    return bulk_discount(sku, 1, price)
+
+def bulk_discount(sku: str, quantity: int, price: int) -> Offer:
+    return Offer(
+        requires_quantities(frozendict({sku: quantity})),
+        frozendict({sku: quantity}),
+        price
+    )
+
 
 OFFERS = frozenset(
     [
-        Offer(requires_quantities(frozendict({"A": 1})), frozendict({"A": 1}), 50),
-        Offer(requires_quantities(frozendict({"A": 3})), frozendict({"A": 3}), 130),
-        Offer(requires_quantities(frozendict({"A": 5})), frozendict({"A": 5}), 200),
-        Offer(requires_quantities(frozendict({"B": 1})), frozendict({"B": 1}), 30),
-        Offer(requires_quantities(frozendict({"B": 2})), frozendict({"B": 2}), 45),
-        Offer(requires_quantities(frozendict({"C": 1})), frozendict({"C": 1}), 20),
-        Offer(requires_quantities(frozendict({"D": 1})), frozendict({"D": 1}), 15),
-        Offer(requires_quantities(frozendict({"E": 1})), frozendict({"E": 1}), 40),
-        Offer(
-            requires_quantities(frozendict({"E": 2})), frozendict({"E": 2, "B": 1}), 80
-        ),
-        Offer(requires_quantities(frozendict({"F": 1})), frozendict({"F": 1}), 10),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"G": 1})), frozendict({"G": 1}), 20),
-        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
-        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
-        Offer(requires_quantities(frozendict({"H": 2})), frozendict({"H": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
-        Offer(requires_quantities(frozendict({"F": 2})), frozendict({"F": 3}), 20),
+        basic_price("A", 50),
+        bulk_discount("A", 3, 130),
+        bulk_discount("A", 5, 200),
+        basic_price("B", 30),
+        bulk_discount("B", 2, )
     ]
 )
 
@@ -144,6 +119,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
         return -1
 
     return get_deal_price(best_deal)
+
 
 
 
