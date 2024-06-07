@@ -25,9 +25,10 @@ class TestCheckout():
       assert checkout_solution.best_price_point("D", 100).quantity == 1
     
     def test_best_price_point_invalid_input(self):
-      
+      assert checkout_solution.best_price_point("E", 1) is None
 
-    # def test_checkout(self):
-    #     checkout_solution.checkout("AAABADC")
+    def test_checkout(self):
+      assert checkout_solution.checkout("AAABADC") == 130 + 30 + 50 + 15 + 20 
+
 
 

@@ -45,8 +45,16 @@ def checkout(skus: str):
         if sku not in quantities:
             quantities[sku] = 0
         quantities[sku] += 1
-    print(best_price_point("A", quantities["A"]))
-    raise NotImplementedError()
+
+    total_price = 0
+    for (sku, quantity) in quantities.items():
+        while quantity > 0:
+            pp = best_price_point(sku, quantity)
+            total_price += pp.price
+            quantity -= pp.quantity
+    
+    return total_price
+
 
 
 
