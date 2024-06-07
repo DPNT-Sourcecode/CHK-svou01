@@ -8,7 +8,7 @@ import math
 from functools import cache, partial
 import line_profiler
 from queue import SimpleQueue, Empty
-from multiprocessing import Pool
+import multiprocessing
 
 Quantities = frozendict[str, int]
 
@@ -132,8 +132,17 @@ def find_best_deal(
     queue = SimpleQueue()
     queue.put(Scenario(quantities, [], offers))
 
+    manager = multiprocessing.Manager()
+    mutex = manager.Lock()
+
     best_price = math.inf
     best_deal = None
+
+    def get_best_price():
+        with mutex:
+            return best_price
+    
+    def set_best(price: int, )
 
     while True:
         try:
@@ -189,5 +198,6 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
 
 if __name__ == "__main__":
     print(checkout("ABCDEFGHIJKLMNOPQRSUVWXYZ"))
+
 
 
