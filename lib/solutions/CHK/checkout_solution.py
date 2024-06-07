@@ -80,9 +80,9 @@ BUY_N_GET_M_FREE = {
     "N": {
         3: {"M": 1}
     },
-    {
-        "R"
-    }
+    "R": {
+        3: {"Q": 1}
+    },
     "U": {
         3: {"U": 1}
     }
@@ -144,3 +144,4 @@ def checkout(skus: str) -> int:
 
 if __name__ == "__main__":
     print(checkout("UUUU"))
+
