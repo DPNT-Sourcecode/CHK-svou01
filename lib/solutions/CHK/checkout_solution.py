@@ -128,6 +128,7 @@ def process_scenario(
     scenario: Scenario
 ) -> Optional[Deal]:
     if all(quantity == 0 for quantity in scenario.quantities.values()):
+        print("Hi")
         return scenario.deal
 
     applicable_offers = list(
@@ -177,6 +178,12 @@ def find_best_deal(
     while True:
         try:
             scenario = queue.get_nowait()
+
+            handle = multiprocessing.Process(target=process_scenario, args=(queue, scenario,))
+            handle.start()
+            handles.append(
+                handle
+            )
         except Empty:
             for handle in handles:
                 handle.join(timeout=0)
@@ -185,14 +192,10 @@ def find_best_deal(
             else:
                 break
         
-        handle = multiprocessing.Process(target=process_scenario, args=(queue, scenario,))
-        handle.start()
-        handles.append(
-            handle
-        )
 
     for handle in handles:
         deal = handle.join()
+        print(deal)
         if deal is not None and (price := get_deal_price(deal)) < best_price:
             best_price = price
             best_deal = deal
@@ -212,10 +215,4 @@ def checkout(skus: str, *, offers: set[Offer] = OFFERS):
     return get_deal_price(best_deal)
 
 if __name__ == "__main__":
-    print(checkout("AAA"))
-
-
-
-
-
-
+    print(checkout("A"))
