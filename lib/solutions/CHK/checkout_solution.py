@@ -10,14 +10,49 @@ from functools import cache, partial
 import line_profiler
 from multiprocessing import Pool
 from threading import Thread
+from queue import Queue
 
 Quantities = frozendict[str, int]
 
 class DealFinder(Thread):
     def __init__(self):
-        self.queue = []
+        self.queue = Queue()
+        self.pool = Pool(5)
+        self.alive = False
+    
+    def __enter__(self):
+        self.pool.__enter()__
+        self.alive = True
+        self.start()
+    
+    def __exit__(self):
+        self.pool.__exit()__
+        self.alive = False
+    
+    # def find_best_deal_applying_offer(
+    #     quantities: Quantities,
+    #     offers: frozenset[Offer],
+    #     offer: Offer,
+    # ) -> Optional[Tuple[Deal, int]]:
+    #     new_quantities = {**quantities}
+    #     for included_sku, included_quantity in offer.includes.items():
+    #         if included_sku in new_quantities:
+    #             new_quantities[included_sku] = max(
+    #                 0, new_quantities[included_sku] - included_quantity
+    #             )
+    #     new_quantities = frozendict(new_quantities)
 
-    def run(self)
+    #     rest_of_deal = find_best_deal(pool, new_quantities, offers=offers)
+    #     if rest_of_deal is None:
+    #         return None
+
+    #     new_deal = FrozenList([offer, *rest_of_deal])
+    #     new_deal.freeze()
+    #     return new_deal, get_deal_price(new_deal)
+
+        def run(self):
+            while self.alive:
+                task = self.queue.pop()
 
 @dataclass(frozen=True)
 class Offer:
@@ -183,6 +218,7 @@ def checkout(skus: str, *, offers: frozenset[Offer] = OFFERS):
 
 if __name__ == "__main__":
     checkout("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 
 
 
