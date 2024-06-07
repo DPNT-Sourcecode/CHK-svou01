@@ -109,15 +109,29 @@ def checkout(skus: str) -> int:
                             applied_offer = True
     
     total_price = 0
-    for sku, offer in BULK_DISCOUNTS.items():
-        if sku not in quantities:
-            continue
+    applied_bulk_discount = True
+    while applied_bulk_discount:
+        applied_bulk_discount = False
+        for sku, offer in BULK_DISCOUNTS.items():
+            if sku not in quantities:
+                continue
 
-        # NOTE: Here I'm using the assumption that bulk discounts
-        #       are ordered from worst to best value
-        for discount_quantity, discount_price in offer.items()[::-1]:
-            if quantities[sku] >= discount_quantity:
-                total_price += discount_price
+            # NOTE: Here I'm using the assumption that bulk discounts
+            #       are ordered from worst to best value
+            for discount_quantity, discount_price in offer.items()[::-1]:
+                if quantities[sku] >= discount_quantity:
+                    total_price += discount_price
+                    quantities[sku] -= discount_quantity
+                    applied_bulk_discount = True
+                    break
+    
+    for sku, quantity in quantities.items():
+        if sku not in BASIC_PRICES:
+            return None
+        total_price += BASIC_PRICES[sku] * quantity
+    
+    return total_price
 
 if __name__ == "__main__":
-    print(checkout("FFFFFF"))
+    print(checkout("AAABADC"))
+
